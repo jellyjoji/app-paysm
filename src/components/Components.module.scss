@@ -1,0 +1,22 @@
+.header {
+  background-color: var(--color-background);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+.cta {
+  padding: var(--padding-medium);
+  background-color: var(--color-primary);
+  color: var(--white);
+  width: 100%;
+}
+.sub {
+  background-color: var(--color-background);
+}

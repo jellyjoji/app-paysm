@@ -1,0 +1,142 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+:root {
+  --white: #ffffff;
+  --gray1: #1f2937;
+  --gray2: #374151;
+  --gray3: #4b5563;
+  --gray4: #6b7280;
+  --gray5: #9ca3af;
+  --gray6: #c8ced3;
+  --gray7: #f2f2f7;
+  --gray8: #f7f8fa;
+  --black: #030712;
+
+  --indigo50: #eef2ff;
+  --red100: #fee2e2;
+  --red300: #fca5a5;
+  --red700: #b91c1c;
+  --blue100: #dbeafe;
+  --blue300: #93c5fd;
+  --blue700: #1d4ed8;
+  --blue950: #2947a1;
+  --green100: #dcfce7;
+  --green300: #86efac;
+  --green700: #15803d;
+  --purple100: #f3e8ff;
+  --purple300: #d8b4fe;
+  --purple700: #7e22ce;
+  --yellow100: #fef9c3;
+  --yellow300: #fde047;
+  --yellow700: #a16207;
+
+  --color-primary: var(--black);
+  --color-secondary: var(--blue950);
+  --color-hover: var(--indigo50);
+  --color-background: var(--gray7);
+  --color-disabled: var(--gray5);
+  --color-error: var(--red700);
+
+  --color-text: var(--black);
+  --color-border: var(--gray3);
+
+  --shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  --opacity: 0.6;
+
+  --transition: 0.2s;
+
+  --text-small: 0.7rem;
+  --text-medium: 1rem;
+  --text-mediumLarge: 1.5rem;
+  --text-large: 2rem;
+
+  --text-weight-xsmall: 300;
+  --text-weight-small: 400;
+  --text-weight-medium: 500;
+  --text-weight-large: 900;
+
+  --radius-small: 0.3rem;
+  --radius-medium: 0.6rem;
+  --radius-large: 2rem;
+
+  --padding-xsmall: 0.3rem;
+  --padding-small: 0.5rem;
+  --padding-medium: 1rem;
+  --padding-large: 1.5rem;
+  --padding-xlarge: 2rem;
+  --padding-xxlarge: 3rem;
+  --padding-xxxlarge: 3.5rem;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --white: #030712;
+    --gray1: rgba(255, 255, 255, 0.7);
+    --gray2: rgba(255, 255, 255, 0.6);
+    --gray3: rgba(255, 255, 255, 0.5);
+    --gray4: rgba(255, 255, 255, 0.4);
+    --gray5: rgba(255, 255, 255, 0.3);
+    --gray6: rgba(255, 255, 255, 0.2);
+    --gray7: rgba(255, 255, 255, 0.1);
+    --gray8: rgba(255, 255, 255, 0.05);
+    --black: #ffffff;
+
+    --indigo50: #eef2ff;
+    --red100: #fee2e2;
+    --red700: #b91c1c;
+    --blue100: #dbeafe;
+    --blue700: #1d4ed8;
+    --blue950: #172554;
+
+    --color-primary: var(--black);
+    --color-secondary: var(--blue950);
+    --color-hover: var(--indigo50);
+    --color-background: var(--gray8);
+    --color-disabled: var(--gray5);
+    --color-error: var(--red700);
+
+    --color-text: var(--black);
+    --color-border: var(--gray3);
+  }
+} */
+
+html {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--color-background);
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+body {
+  font-family: "Pretendard", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+main {
+  padding: var(--padding-medium);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  border: 1px solid red;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  all: unset;
+  cursor: pointer;
+  border: none;
+  padding: var(--padding-small);
+}
+/* @media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+} */
