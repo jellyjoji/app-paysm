@@ -11,25 +11,25 @@ export default function Home() {
       <h2>다양한 결제 수단으로 편리하고 안전한 결제를 지원해 드려요.</h2>
       <div className={styles.container__payment}>
         <div className={styles.container__payment__item}>
-          <Image src="/link.png" alt="손 이미지"
-            width={150}
-            height={150} />
+          <Image src="/link.png" alt="링크 결제"
+            width={100}
+            height={100} />
           <p>
             링크 결제
           </p>
         </div>
         <div className={styles.container__payment__item}>
-          <Image src="/manual.png" alt="손 이미지"
-            width={150}
-            height={150} />
+          <Image src="/manual.png" alt="수기 결제"
+            width={100}
+            height={100} />
           <p>
             수기 결제
           </p>
         </div>
         <div className={styles.container__payment__item}>
-          <Image src="/qr.png" alt="손 이미지"
-            width={150}
-            height={150} />
+          <Image src="/qr.png" alt="큐알 결제"
+            width={100}
+            height={100} />
           <p>
             QR 결제
           </p>

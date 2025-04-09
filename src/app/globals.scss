@@ -49,6 +49,7 @@
   --text-medium: 1rem;
   --text-mediumLarge: 1.5rem;
   --text-large: 2rem;
+  --text-xlarge: 2.5rem;
 
   --text-weight-xsmall: 300;
   --text-weight-small: 400;
@@ -66,6 +67,8 @@
   --padding-xlarge: 2rem;
   --padding-xxlarge: 3rem;
   --padding-xxxlarge: 3.5rem;
+
+  --max-width: 640px;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -101,7 +104,7 @@
 } */
 
 html {
-  max-width: 640px;
+  max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
   background-color: var(--color-background);
@@ -134,6 +137,12 @@ button {
   cursor: pointer;
   border: none;
   padding: var(--padding-small);
+}
+h1 {
+  font-size: var(--text-xlarge);
+}
+h2 {
+  font-weight: var(--text-weight-medium);
 }
 /* @media (prefers-color-scheme: dark) {
   html {

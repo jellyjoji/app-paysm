@@ -7,9 +7,11 @@
 .btn {
   position: fixed;
   bottom: 0;
-  left: 0;
   width: 100%;
   text-align: center;
+  max-width: var(--max-width);
+  left: 50%;
+  transform: translateX(-50%);
 }
 .cta {
   padding: var(--padding-medium);

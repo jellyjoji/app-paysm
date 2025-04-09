@@ -2,8 +2,9 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { House, ChevronLeft } from 'lucide-react';
+import { House, ChevronLeft, Menu } from 'lucide-react';
 import styles from './Components.module.scss';
+import Image from "next/image";
 
 
 export default function Header() {
@@ -15,7 +16,7 @@ export default function Header() {
     const path = pathname.toLowerCase();
     switch (pathname) {
       case '/':
-        setTitle('MAIN');
+        setTitle('HOME');
         break;
 
       case '/login':
@@ -63,23 +64,43 @@ export default function Header() {
     }
   }, [pathname]);
 
-  const home = () => {
+  const isHome = pathname === '/';
+
+  const goHome = () => {
     router.push('/')
   }
 
-  const back = () => {
+  const goBack = () => {
     router.back(); // 🔙 뒤로 가기 기능
   };
 
+  const goMenu = () => {
+    router.push('/menu')
+  }
+
   return (
-    <header className={styles.header}>
-      <button onClick={back}>
-        <ChevronLeft />
-      </button>
-      <h2>{title}</h2>
-      <button onClick={home}>
-        <House />
-      </button>
-    </header>
-  );
+    <>
+      <header className={styles.header}>
+        {isHome ? (<>
+          <Image
+            src="/logo.png"
+            alt="페이즘"
+            width={71}
+            height={32}
+          ></Image>
+          <button onClick={goMenu}>
+            <Menu />
+          </button></>
+        ) : (<>
+          <button onClick={goBack}>
+            <ChevronLeft />
+          </button>
+          <h2>{title}</h2>
+          <button onClick={goHome}>
+            <House />
+          </button></>
+        )}
+      </header >
+
+    </>);
 }
