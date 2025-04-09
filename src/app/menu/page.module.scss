@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-large);
+  &__content {
+    background-color: var(--white);
+    border-radius: var(--radius-medium);
+    padding: var(--padding-medium);
+    line-height: 2rem;
+  }
+}
+.profile {
+  display: flex;
+  gap: var(--padding-medium);
+  align-items: center;
+}

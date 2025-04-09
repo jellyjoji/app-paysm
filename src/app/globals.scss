@@ -125,7 +125,7 @@ main {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  border: 1px solid red;
+  /* border: 1px solid gray; */
 }
 
 a {
@@ -144,6 +144,13 @@ h1 {
 h2 {
   font-weight: var(--text-weight-medium);
 }
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 /* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

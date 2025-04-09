@@ -24,7 +24,12 @@
 @media (hover: hover) and (pointer: fine) {
 }
 
-@media (max-width: 600px) {
+@media (max-width: 375px) {
+  .container {
+    &__content {
+      gap: var(--padding-medium);
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
