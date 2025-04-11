@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-medium);
+  &__tab {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__date {
+    display: flex;
+    gap: var(--padding-small);
+    align-items: center;
+  }
+  &__content {
+    background-color: var(--white);
+    line-height: 2rem;
+    padding: var(--padding-medium);
+    border-radius: var(--radius-medium);
+    &__item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      &__info {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+}

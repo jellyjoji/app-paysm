@@ -136,7 +136,7 @@ button {
   all: unset;
   cursor: pointer;
   border: none;
-  padding: var(--padding-small);
+  padding: var(--padding-medium);
 }
 h1 {
   font-size: var(--text-xlarge);
@@ -156,3 +156,14 @@ li {
     color-scheme: dark;
   }
 } */
+
+.active {
+  border-bottom: 2px solid var(--black);
+}
+
+.statusDone {
+  color: var(--green700);
+}
+.statusPending {
+  color: var(--red700);
+}
