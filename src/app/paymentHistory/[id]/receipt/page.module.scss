@@ -1,0 +1,13 @@
+.container {
+  background-color: var(--white);
+  border-radius: var(--radius-small);
+  line-height: 2rem;
+  padding: var(--padding-medium);
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    &__title {
+      color: var(--color-subText);
+    }
+  }
+}

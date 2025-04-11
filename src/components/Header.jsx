@@ -13,7 +13,17 @@ export default function Header() {
   const [title, setTitle] = useState('');
 
   useEffect(() => {
+
     const path = pathname.toLowerCase();
+
+    if (path.startsWith('/paymenthistory/') && path.endsWith('/receipt')) {
+      setTitle('영수증 조회');
+      return;
+    }
+    if (path.startsWith('/paymenthistory/')) {
+      setTitle('결제 내역 상세');
+      return;
+    }
     switch (pathname) {
       case '/':
         setTitle('HOME');

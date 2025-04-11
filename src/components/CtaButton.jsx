@@ -27,6 +27,7 @@ export default function CTAButton() {
 
       default:
         alert('기본 CTA 버튼입니다.');
+
     }
   };
 

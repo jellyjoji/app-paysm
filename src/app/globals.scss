@@ -38,6 +38,7 @@
   --color-error: var(--red700);
 
   --color-text: var(--black);
+  --color-subText: var(--gray3);
   --color-border: var(--gray3);
 
   --shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
@@ -166,4 +167,13 @@ li {
 }
 .statusPending {
   color: var(--red700);
+}
+.statusCanceled {
+  color: var(--gray5);
+  /* text-decoration: line-through; */
+}
+input {
+  line-height: 2rem;
+  padding-left: 1rem;
+  border-radius: var(--radius-small);
 }
