@@ -55,6 +55,7 @@
   --text-weight-xsmall: 300;
   --text-weight-small: 400;
   --text-weight-medium: 500;
+  --text-weight-xmedium: 700;
   --text-weight-large: 900;
 
   --radius-small: 0.3rem;
@@ -126,7 +127,7 @@ main {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  /* border: 1px solid gray; */
+  border: 1px solid gray;
 }
 
 a {

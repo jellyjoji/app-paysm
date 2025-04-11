@@ -1,3 +1,7 @@
+'use client';
+
+import styles from './page.module.scss';
+
 export default function UserInfo() {
-  return <>content</>
+  return <>회원정보조회</>
 }
