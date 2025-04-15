@@ -7,14 +7,12 @@
 .btn {
   position: fixed;
   bottom: 0;
-  width: 100%;
   text-align: center;
   max-width: var(--max-width);
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
 }
 .cta {
-  padding: var(--padding-medium);
+  padding: var(--padding-medium) 0;
   background-color: var(--color-primary);
   color: var(--white);
   width: 100%;

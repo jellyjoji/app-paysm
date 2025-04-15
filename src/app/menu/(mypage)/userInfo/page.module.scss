@@ -1,0 +1,26 @@
+.container {
+  &__search {
+    display: flex;
+    gap: var(--padding-medium);
+    padding-bottom: var(--padding-medium);
+    &__input {
+      iput {
+      }
+    }
+    &__btn {
+    }
+  }
+  &__content {
+    &__card {
+      padding: var(--padding-medium);
+      border-radius: var(--radius-medium);
+      background-color: var(--white);
+      display: flex;
+      justify-content: space-between;
+      &__info {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+}

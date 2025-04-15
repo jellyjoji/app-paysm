@@ -16,11 +16,11 @@ export default function Header() {
 
     const path = pathname.toLowerCase();
 
-    if (path.startsWith('/paymenthistory/') && path.endsWith('/receipt')) {
+    if (path.startsWith('/menu/paymenthistory/') && path.endsWith('/receipt')) {
       setTitle('영수증 조회');
       return;
     }
-    if (path.startsWith('/paymenthistory/')) {
+    if (path.startsWith('/menu/paymenthistory/')) {
       setTitle('결제 내역 상세');
       return;
     }
@@ -41,19 +41,19 @@ export default function Header() {
         setTitle('메뉴');
         break;
 
-      case '/paymentHistory':
+      case '/menu/paymentHistory':
         setTitle('결제 내역 확인');
         break;
 
-      case '/paymentInfo':
+      case '/menu/paymentInfo':
         setTitle('결제 필수 정보');
         break;
 
-      case '/userInfo':
+      case '/menu/userInfo':
         setTitle('UserInfo');
         break;
 
-      case '/changePassword':
+      case '/menu/changePassword':
         setTitle('비밀번호 변경');
         break;
 

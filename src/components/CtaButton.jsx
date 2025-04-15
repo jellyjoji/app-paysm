@@ -78,5 +78,6 @@ export default function CTAButton() {
       <button className={styles.cta} onClick={handleClick}>
         {getLabel()}
       </button>
-    </div>);
+    </div>
+  );
 }

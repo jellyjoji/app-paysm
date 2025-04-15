@@ -7,16 +7,16 @@ const menuData = [
   {
     category: '마이페이지',
     items: [
-      { name: '결제 내역 확인', path: '/paymentHistory' },
-      { name: '결제 필수 정보', path: '/paymentInfo' },
-      { name: '회원 정보 조회', path: '/userInfo' },
+      { name: '결제 내역 확인', path: '/menu/paymentHistory' },
+      { name: '결제 필수 정보', path: '/menu/paymentInfo' },
+      { name: '회원 정보 조회', path: '/menu/userInfo' },
     ]
   },
   {
     category: '설정',
     items: [
-      { name: '비밀번호 변경', path: '/changePassword' },
-      { name: '로그아웃', path: '/logout' },
+      { name: '비밀번호 변경', path: '/menu/changePassword' },
+      { name: '로그아웃', path: '/menu/logout' },
     ]
   },
 ]
