@@ -1,9 +1,11 @@
+/* header */
 .header {
   background-color: var(--color-background);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+/* CTA button */
 .btn {
   position: fixed;
   bottom: 0;
@@ -19,4 +21,43 @@
 }
 .sub {
   background-color: var(--color-background);
+}
+
+/* modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--shadow-drop);
+  &__content {
+    background: var(--white);
+    border-radius: var(--radius-medium);
+    max-width: 260px;
+    margin: 30% auto;
+    text-align: center;
+
+    &__info {
+      padding: var(--padding-large);
+      p {
+        padding-top: var(--padding-small);
+      }
+    }
+    &__btn {
+      display: flex;
+      &__cancel {
+        color: var(--black);
+        background-color: var(--gray7);
+        border-radius: 0 0 0 var(--radius-medium);
+      }
+      &__confirm {
+        color: var(--white);
+        background-color: var(--red700);
+        border-radius: 0 0 var(--radius-medium) 0;
+
+        flex: 1;
+      }
+    }
+  }
 }

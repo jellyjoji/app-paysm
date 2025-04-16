@@ -1,14 +1,29 @@
 'use client';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.scss';
 import { Search } from 'lucide-react';
+import { useEffect, useState } from "react";
 
 
 export default function UserInfo() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isBlocked, setIsBlocked] = useState(true);
   const router = useRouter();
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const res = await fetch("/api"); // Next.js의 API 경유
+        const data = await res.json();
+        setUsers(data); // ✅ 여러 유저 저장
+      } catch (error) {
+        console.error('유저 데이터 불러오기 실패:', err);
+      }
+    };
+
+    getUsers();
+  }, []);
 
   const handleClick = () => {
     setIsBlocked((prev) => !prev);
@@ -56,22 +71,25 @@ export default function UserInfo() {
       </div>
 
       <div className={styles.container__content}>
-        <div className={styles.container__content__card}>
-          <div
-            className={styles.container__content__card__info}
-            onClick={handleCardClick} // ✅ 클릭 시 이동
-            style={{ cursor: 'pointer' }} // 마우스 오버 시 손가락 모양
-          >
-            <h3>User name</h3>
-            <p>ID</p>
+        {users.map((user, idx) => (
+          <div key={idx} className={styles.container__content__card}>
+            <div
+              className={styles.container__content__card__info}
+              onClick={handleCardClick}
+              style={{ cursor: 'pointer' }}
+            >
+              <h3>{user.name}</h3>
+              <p>{user.userId}</p>
+            </div>
+            <button
+              className={isBlocked ? "unblock" : "blocked"}
+              onClick={handleClick}
+            >
+              <h2>{isBlocked ? "차단하기" : "차단 풀기"}</h2>
+            </button>
           </div>
-          <button
-            className={isBlocked ? "unblock" : "blocked"}
-            onClick={handleClick}
-          >
-            <h2>{isBlocked ? "차단하기" : "차단 풀기"}</h2>
-          </button>
-        </div>
+        ))}
+
       </div>
     </div>
   </>

@@ -1,23 +1,25 @@
-import axios from "axios";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.1.8:8080/api";
 
-export default async function fetchData(username, password) {
-  try {
-    // Create a new FormData object
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
+// JWT 토큰이 필요한 GET 요청
+export async function fetchWithToken(endpoint) {
+  const token = localStorage.getItem("jwtToken");
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("API 호출 실패");
+  return await res.json();
+}
 
-    const response = await axios.post(
-      "http://192.168.1.8:8080/api/auth/login",
-      formData, // Send the form data
-      {
-        headers: { "Content-Type": "multipart/form-data" }, // FormData automatically sets the correct content type
-        withCredentials: true, // ✅ axios에서 쿠키 포함 시 필요
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("로그인 실패:", error);
-    throw new Error("로그인 실패");
-  }
+// 로그인 요청
+export async function login(userId, password) {
+  const res = await fetch(`${API_BASE_URL}/user/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, password }),
+  });
+
+  return await res.json();
 }
