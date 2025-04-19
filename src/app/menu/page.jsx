@@ -2,8 +2,9 @@
 import styles from './page.module.scss';
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
-import { useState } from "react";
 import Modal from "@/components/Modal";
+import { useEffect, useState } from 'react';
+import { fetchWithToken } from '@/lib/api';
 
 const menuData = [
   {
@@ -23,9 +24,13 @@ const menuData = [
   },
 ]
 
+
+
 export default function Menu() {
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
 
   const handleLogout = async () => {
     await fetch("http://192.168.1.8:8080/logout", {
@@ -43,6 +48,23 @@ export default function Menu() {
     }
   };
 
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        const data = await fetchWithToken('/user/myPage'); // ✅ 로그인된 사용자 정보
+        setUser(data);
+      } catch (err) {
+        setError('사용자 정보를 불러오지 못했습니다.');
+        console.error(err);
+      }
+    };
+    fetchDetail();
+  }, []);
+  if (error) {
+    return <div style={{ padding: '2rem', color: 'red' }}>{error}</div>;
+  }
+  if (!user) return <div style={{ padding: '2rem' }}>불러오는 중...</div>;
+
   return (
     <div className={styles.container}>
       <div className={`${styles.container__content} ${styles.profile}`}>
@@ -53,8 +75,8 @@ export default function Menu() {
           height={50}
         />
         <div>
-          <h3>YOUR NAME</h3>
-          <p>000-0000-0000</p>
+          <h3>{user?.userName}</h3>
+          <p>{user?.userPhone}</p>
         </div>
       </div>
 
