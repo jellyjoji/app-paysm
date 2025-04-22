@@ -30,22 +30,25 @@ export default function ManualPayment() {
 
   return <>
     <div className={styles.container}>
-      <Link href="/manualPayment/scanCard">
 
-        <div className={styles.container__form__content}>
-          <button className={styles.container__form__content__addBtn}>
-            <div className={styles.container__form__content__addBtn__title}>
-              <span> <ScanLine /></span>
-              <span>카드 번호 스캔하기</span>
-            </div>
-
-            <ChevronRight />
-
-          </button>
-        </div>
-      </Link>
 
       <div className={styles.container__form} onSubmit={handleSubmit}>
+
+        <Link href="/manualPayment/scanCard">
+
+          <div className={styles.container__form__content}>
+            <button className={styles.container__form__content__addBtn}>
+              <div className={styles.container__form__content__addBtn__title}>
+                <span> <ScanLine /></span>
+                <span>카드 번호 스캔하기</span>
+              </div>
+
+              <ChevronRight />
+
+            </button>
+          </div>
+        </Link>
+
         <div className={styles.container__form__content}>
           <label htmlFor="cardNumber">카드번호</label>
           <input type="text" name="cardNumber" id="cardNumber" placeholder="1234 5678 9012 3456"
@@ -64,6 +67,16 @@ export default function ManualPayment() {
             maxLength="5"
             inputMode="numeric"
             ref={inputRef}
+          />
+
+          <label htmlFor="cardPassword">비밀번호</label>
+
+          <input
+            type="password"
+            name="cardPassword"
+            id="cardPassword"
+            placeholder="앞 2자리"
+            maxLength="2"
           />
         </div>
 

@@ -17,7 +17,7 @@ export default function UserInfo() {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const data = await fetchWithToken('/user/myPage');
+        const data = await fetchWithToken('/api/user/myPage');
         setUser(data);
       } catch (err) {
         console.error('사용자 정보 로드 실패:', err);

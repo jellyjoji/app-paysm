@@ -51,7 +51,7 @@ export default function Menu() {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const data = await fetchWithToken('/user/myPage'); // ✅ 로그인된 사용자 정보
+        const data = await fetchWithToken('/api/user/myPage'); // ✅ 로그인된 사용자 정보
         setUser(data);
       } catch (err) {
         setError('사용자 정보를 불러오지 못했습니다.');

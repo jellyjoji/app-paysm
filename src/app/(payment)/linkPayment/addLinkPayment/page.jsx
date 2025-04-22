@@ -1,16 +1,17 @@
 "use client";
-
+import styles from "./page.module.scss";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
 
-export default function AddLinkPaymentPage() {
+export default function AddLinkPayment() {
   const [goodsNm, setGoodsNm] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
   const [token, setToken] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
+    // JWT 토큰 로컬스토리지에서 가져오기
     const storedToken = localStorage.getItem("jwtToken");
     setToken(storedToken);
   }, []);
@@ -18,6 +19,7 @@ export default function AddLinkPaymentPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 토큰이 없으면 로그인 유도
     if (!token) {
       alert("로그인이 필요합니다.");
       return;
@@ -30,7 +32,7 @@ export default function AddLinkPaymentPage() {
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/product/productAdd`, {
+      const res = await fetch(`${API_BASE_URL}/api/product/productAdd`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -43,9 +45,10 @@ export default function AddLinkPaymentPage() {
 
       const result = await res.json();
 
+      // 상품 등록 성공 메시지와 페이지 리다이렉트
       alert(result.message);
       if (result.code === 200) {
-        router.push(`${API_BASE_URL}/product/linkPayList`);
+        router.push("/linkPayment");
       }
     } catch (err) {
       console.error(err);
@@ -54,35 +57,35 @@ export default function AddLinkPaymentPage() {
   };
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>링크 결제 상품 추가</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          상품명
-        </label>
-        <input
-          type="text"
-          value={goodsNm}
-          onChange={(e) => setGoodsNm(e.target.value)}
-          required
-        />
+    <div className={styles.container}>
+      <form onSubmit={handleSubmit} className={styles.container__form}>
+        <div className={styles.container__form__content}>
+          <label htmlFor="goodsNm">상품명</label>
+          <input
+            type="text"
+            name="goodsNm"
+            id="goodsNm"
+            value={goodsNm}
+            onChange={(e) => setGoodsNm(e.target.value)}
+            placeholder="상품명"
+            required
+          />
+        </div>
 
-        <label style={{ display: "block", marginTop: 15, fontWeight: "bold" }}>
-          단가
-        </label>
-        <input
-          type="number"
-          value={unitPrice}
-          onChange={(e) => setUnitPrice(e.target.value)}
-          required
-        />
+        <div className={styles.container__form__content}>
+          <label htmlFor="unitPrice">상품 가격</label>
+          <input
+            type="number"
+            name="unitPrice"
+            id="unitPrice"
+            value={unitPrice}
+            onChange={(e) => setUnitPrice(e.target.value)}
+            placeholder="상품 가격"
+            required
+          />
+        </div>
 
-        <button
-          type="submit"
-
-        >
-          상품 등록
-        </button>
+        <button type="submit">상품 등록</button>
       </form>
     </div>
   );

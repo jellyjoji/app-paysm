@@ -21,7 +21,7 @@ export default function UserDetail() {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        const users = await fetchWithToken('/user'); // 모든 사용자 목록
+        const users = await fetchWithToken('/api/user'); // 모든 사용자 목록
         const selectedUser = users.find((u) => u.userId === id); // 해당 id만 필터링
         if (!selectedUser) throw new Error("해당 유저를 찾을 수 없습니다.");
         setUser(selectedUser);

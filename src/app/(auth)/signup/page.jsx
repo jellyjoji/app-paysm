@@ -29,7 +29,7 @@ export default function Signup() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${API_BASE_URL}/user/signUp`, {
+      const res = await fetch(`${API_BASE_URL}/api/user/signUp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

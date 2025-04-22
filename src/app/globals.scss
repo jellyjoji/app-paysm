@@ -179,8 +179,8 @@ li {
   color: var(--gray5);
   /* text-decoration: line-through; */
 }
-input {
-  line-height: 2rem;
+input, textarea {
+  line-height: 2.5rem;
   padding-left: 1rem;
   border-radius: var(--radius-small);
 }

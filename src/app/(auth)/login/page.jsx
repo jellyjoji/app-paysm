@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react';
 import styles from "./page.module.scss";
-import { login } from '@/lib/api';
+import { login } from '../../../lib/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
