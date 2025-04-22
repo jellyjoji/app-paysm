@@ -1,14 +1,41 @@
 'use client';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.scss';
 import { Search } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { fetchWithToken } from '@/lib/api';
 
 
 export default function UserInfo() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isBlocked, setIsBlocked] = useState(true);
   const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const data = await fetchWithToken('/api/user/myPage');
+        setUser(data);
+      } catch (err) {
+        console.error('사용자 정보 로드 실패:', err);
+        setError('로그인이 필요하거나 사용자 정보를 불러오지 못했습니다.');
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  if (error) {
+    return <div style={{ padding: '2rem', color: 'red' }}>{error}</div>;
+  }
+
+  if (!user) {
+    return <div style={{ padding: '2rem' }}>불러오는 중...</div>;
+  }
+
 
   const handleClick = () => {
     setIsBlocked((prev) => !prev);
@@ -18,8 +45,8 @@ export default function UserInfo() {
     setSearchTerm(event.target.value);
   };
 
-  const handleCardClick = () => {
-    router.push('/menu/userInfo/userDetail'); // ✅ 원하는 경로로 이동
+  const handleCardClick = (userId) => {
+    router.push(`/menu/userInfo/userDetail/${userId}`);
   };
 
   const handleSearch = () => {
@@ -30,7 +57,7 @@ export default function UserInfo() {
   return <>
     <div className={styles.container}>
       <div className={styles.container__search}>
-        <div className={styles.container__serach__input} style={{ position: 'relative', display: 'inline-block' }}>
+        <div className={styles.container__serach__input} style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
           <Search
             style={{
               flex: 1,
@@ -47,7 +74,7 @@ export default function UserInfo() {
             value={searchTerm}
             onChange={handleInputChange}
             style={{
-              padding: '8px 8px 8px 42px', // 왼쪽 패딩을 아이콘만큼 줘야 겹치지 않음
+              padding: '8px 8px 8px 42px',
             }}
           />
         </div>
@@ -59,11 +86,11 @@ export default function UserInfo() {
         <div className={styles.container__content__card}>
           <div
             className={styles.container__content__card__info}
-            onClick={handleCardClick} // ✅ 클릭 시 이동
-            style={{ cursor: 'pointer' }} // 마우스 오버 시 손가락 모양
+            onClick={() => handleCardClick(user.userId)}
+            style={{ cursor: 'pointer' }}
           >
-            <h3>User name</h3>
-            <p>ID</p>
+            <h3>{user.userName}</h3>
+            <p>{user.userId}</p>
           </div>
           <button
             className={isBlocked ? "unblock" : "blocked"}

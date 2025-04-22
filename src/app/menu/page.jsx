@@ -40,13 +40,13 @@ export default function Menu() {
     window.location.href = "/";
   };
 
-  // const handleClick = (path) => {
-  //   if (path === 'logout') {
-  //     setShowLogoutModal(true);
-  //   } else {
-  //     router.push(path);
-  //   }
-  // };
+  const handleClick = (path) => {
+    if (path === 'logout') {
+      // setShowLogoutModal(true);
+    } else {
+      router.push(path);
+    }
+  };
 
   useEffect(() => {
     const fetchDetail = async () => {
