@@ -33,11 +33,9 @@ export default function Menu() {
   const [error, setError] = useState('');
 
   const handleLogout = async () => {
-    await fetch("http://192.168.1.8:8080/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    window.location.href = "/";
+    localStorage.removeItem("jwtToken"); // 토큰 삭제
+    setShowLogoutModal(false);           // 모달 닫기
+    router.push("/login");
   };
 
   const handleClick = (path) => {

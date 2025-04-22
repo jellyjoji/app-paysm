@@ -4,7 +4,7 @@ import styles from "./page.module.scss";
 import { login } from '../../../lib/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-
+import { Eye, EyeClosed } from 'lucide-react';
 
 export default function Login() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const savedId = localStorage.getItem("rememberedUserId");
@@ -63,17 +63,27 @@ export default function Login() {
             id="id"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}  // 입력값을 상태로 저장
+            placeholder="홍길동"
             required
           />
         </div>
         <div className={styles.container__form__content}>
           <label htmlFor="password">비밀번호</label>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}  // 입력값을 상태로 저장
+            placeholder="abc12#"
             required />
+
+          <button
+            className={styles.container__form__content__eye}
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <EyeClosed /> : <Eye />}
+          </button>
         </div>
 
         <div className={styles.container__form__content}>

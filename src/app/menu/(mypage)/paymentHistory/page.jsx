@@ -1,31 +1,75 @@
 "use client"
 import styles from './page.module.scss';
 import { SlidersHorizontal } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL } from "@/lib/api";
 
 
 export default function PaymentHistory() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [payments, setPayments] = useState([]);
+
   const router = useRouter();
 
-
   const [activeTab, setActiveTab] = useState("전체");
-  const tasks = [
-    { id: 1, product: "상품1", price: "9,900원", name: "김이름", done: true, canceled: false },
-    { id: 2, product: "상품2", price: "9,900원", name: "김이름", done: false, canceled: false },
-    { id: 3, product: "상품3", price: "9,900원", name: "김이름", done: true, canceled: false },
-    { id: 4, product: "상품4", price: "9,900원", name: "김이름", done: false, canceled: true }, // 결제 취소
-  ];
 
-  const filtered = tasks.filter((task) => {
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) {
+          alert("로그인이 필요합니다.");
+          return;
+        }
+
+        const formatDate = (date) => date ? date.toISOString().split("T")[0] : null;
+
+        const body = {
+          startDate: formatDate(startDate) || "",
+          endDate: formatDate(endDate) || "",
+        };
+
+        const res = await fetch(`${API_BASE_URL}/api/payment/getPaymentListByMerchant`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+
+        });
+
+
+        if (!res.ok)
+          throw new Error("결제 목록 요청 실패");
+        const data = await res.json();
+        console.log(data);
+        console.log("응답 상태 코드:", res.status);
+
+        setPayments(data);
+      } catch (err) {
+        console.error("❌ 오류:", err);
+        console.log("결제 목록을 불러오지 못했습니다.");
+
+
+      }
+    };
+
+    fetchPayments();
+  }, [startDate, endDate]);
+
+
+
+  // ✅ 필터 처리
+  const filtered = payments.filter((payment) => {
     if (activeTab === "전체") return true;
-    if (activeTab === "완료") return task.done;
-    if (activeTab === "미완료") return !task.done;
+    if (activeTab === "완료") return payment.resultMsg === "정상처리" && payment.cancelYN === "N";
+    if (activeTab === "미완료") return payment.resultMsg !== "정상처리" || payment.cancelYN === "Y";
   });
 
   return <div className={styles.container}>
@@ -55,9 +99,7 @@ export default function PaymentHistory() {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
-              if (endDate && date > endDate) {
-                setEndDate(null); // 시작일이 종료일보다 크면 종료일 초기화
-              }
+              if (endDate && date > endDate) setEndDate(null);
             }}
             selectsStart
             startDate={startDate}
@@ -83,29 +125,28 @@ export default function PaymentHistory() {
       </div>
     )}
 
-    {filtered.map((task) => (
-      <ul key={task.id} className={styles.container__content}>
-        <li className={styles.container__content__item} onClick={() => router.push(`/paymentHistory/${task.id}`)}>
+    {filtered.map((payment) => (
+      <ul key={payment.paymentId} className={styles.container__content}>
+        <li className={styles.container__content__item} onClick={() => router.push(`/paymentHistory/${payment.paymentId}`)}>
           <div className={styles.container__content__item__info}>
-            <h4>{task.product}</h4>
-            <p>{task.price}</p>
+            <h4>{payment.goodsName}</h4>
+            <p>{payment.amt.toLocaleString()}원</p>
           </div>
           <h2
             className={
-              task.done
-                ? "statusDone"
-                : task.canceled
-                  ? "statusCanceled"
+              payment.cancelYN === "Y"
+                ? "statusCanceled"
+                : payment.resultMsg === "정상처리"
+                  ? "statusDone"
                   : "statusPending"
             }
           >
-            {task.done
-              ? "완료"
-              : task.canceled
-                ? "결제 취소"
+            {payment.cancelYN === "Y"
+              ? "결제 취소"
+              : payment.resultMsg === "정상처리"
+                ? "완료"
                 : "미완료"}
           </h2>
-
         </li>
       </ul>
     ))}
