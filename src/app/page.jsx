@@ -3,8 +3,19 @@ import Image from "next/image";
 import styles from "./page.module.scss";
 import Link from "next/link";
 
-export default function Home() {
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
+export default function Home() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken')
+
+    if (!token || !isTokenValid(token)) {
+      router.replace('/login') // 토큰 없거나 만료되면 로그인 페이지로 리다이렉션
+    }
+  }, [])
 
   return (
     <div className={styles.container}>
@@ -47,4 +58,15 @@ export default function Home() {
       </div>
     </div >
   );
+}
+
+// JWT 유효성 검사 함수
+function isTokenValid(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const now = Math.floor(Date.now() / 1000)
+    return payload.exp > now
+  } catch {
+    return false
+  }
 }
