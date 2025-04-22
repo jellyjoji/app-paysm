@@ -2,7 +2,7 @@
 import styles from './page.module.scss';
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
-// import Modal from "@/components/Modal";
+import Modal from "@/components/Modal";
 import { useEffect, useState } from 'react';
 import { fetchWithToken } from '@/lib/api';
 
@@ -28,7 +28,7 @@ const menuData = [
 
 export default function Menu() {
   const router = useRouter();
-  // const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
 
@@ -42,7 +42,7 @@ export default function Menu() {
 
   const handleClick = (path) => {
     if (path === 'logout') {
-      // setShowLogoutModal(true);
+      setShowLogoutModal(true);
     } else {
       router.push(path);
     }
@@ -99,7 +99,7 @@ export default function Menu() {
         </div>
       ))}
 
-      {/* {showLogoutModal && (
+      {showLogoutModal && (
         <Modal
           title="로그아웃"
           message="정말 로그아웃 하시겠습니까?"
@@ -108,7 +108,7 @@ export default function Menu() {
           onConfirm={handleLogout}
           onCancel={() => setShowLogoutModal(false)}
         />
-      )} */}
+      )}
     </div>
   );
 }
