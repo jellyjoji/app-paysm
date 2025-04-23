@@ -9,11 +9,20 @@ import { API_BASE_URL } from "@/lib/api";
 
 
 export default function PaymentHistory() {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [payments, setPayments] = useState([]);
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0); // 오늘 자정(00:00:00)
+    return date;
+  });
 
+  const [endDate, setEndDate] = useState(() => {
+    const date = new Date();
+    date.setHours(23, 59, 59, 999); // 오늘 끝(23:59:59.999)
+    return date;
+  });
+
+  const [showDatePicker, setShowDatePicker] = useState(true);
+  const [payments, setPayments] = useState([]);
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState("전체");
@@ -55,8 +64,6 @@ export default function PaymentHistory() {
       } catch (err) {
         console.error("❌ 오류:", err);
         console.log("결제 목록을 불러오지 못했습니다.");
-
-
       }
     };
 
@@ -69,13 +76,14 @@ export default function PaymentHistory() {
   const filtered = payments.filter((payment) => {
     if (activeTab === "전체") return true;
     if (activeTab === "완료") return payment.resultMsg === "정상처리" && payment.cancelYN === "N";
-    if (activeTab === "미완료") return payment.resultMsg !== "정상처리" || payment.cancelYN === "Y";
+    if (activeTab === "미완료") return payment.resultMsg !== "정상처리";
+    if (activeTab === "결제 취소") return payment.cancelYN === "Y"; // 👈 추가
   });
 
   return <div className={styles.container}>
     <div className={styles.container__tab}>
       <div className={styles.container__tab__item}>
-        {["전체", "완료", "미완료"].map((tab) => (
+        {["전체", "완료", "미완료", "결제 취소"].map((tab) => (
           <button
             key={tab}
             className={`${styles.tab} ${activeTab === tab ? 'active' : ""
@@ -99,7 +107,9 @@ export default function PaymentHistory() {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
-              if (endDate && date > endDate) setEndDate(null);
+              if (endDate && date > endDate) {
+                setEndDate(date); // 자동 조정
+              }
             }}
             selectsStart
             startDate={startDate}
@@ -127,7 +137,7 @@ export default function PaymentHistory() {
 
     {filtered.map((payment) => (
       <ul key={payment.paymentId} className={styles.container__content}>
-        <li className={styles.container__content__item} onClick={() => router.push(`/paymentHistory/${payment.paymentId}`)}>
+        <li className={styles.container__content__item} onClick={() => router.push(`/menu/paymentHistory/${payment.paymentId}`)}>
           <div className={styles.container__content__item__info}>
             <h4>{payment.goodsName}</h4>
             <p>{payment.amt.toLocaleString()}원</p>
