@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import styles from "./page.module.scss";
 import { QrCode, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from "react";
@@ -8,19 +8,16 @@ import Link from "next/link";
 export default function QrPayment() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
 
   useEffect(() => {
-    // 로컬 스토리지에서 JWT 토큰 가져오기
     const token = localStorage.getItem("jwtToken");
-    console.log("토큰 확인: ", token);
-
 
     if (token) {
-      // 상품 목록 데이터 요청
       fetch(`${API_BASE_URL}/api/product/linkProductFindAllByUserId`, {
         method: 'GET',
         headers: {
-          "Authorization": `Bearer ${token}`, // 인증 토큰 포함
+          "Authorization": `Bearer ${token}`,
         },
       })
         .then((response) => {
@@ -30,64 +27,73 @@ export default function QrPayment() {
           return response.json();
         })
         .then((data) => {
-          setProducts(data); // 받은 데이터를 상태로 설정
+          setProducts(data);
         })
         .catch((err) => {
-          setError(err.message); // 에러 처리
+          setError(err.message);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     } else {
       setError("로그인 토큰이 없습니다.");
+      setIsLoading(false);
     }
-  }, []); // 컴포넌트가 처음 렌더링될 때만 실행
-
-  if (error) {
-    return <p>{error}</p>; // 에러 메시지 출력
-  }
+  }, []);
 
   return (
     <div className={styles.container}>
-
       <ul className={styles.container__form}>
-        <Link href="/linkPayment/addQrPayment">
 
-          <div className={styles.container__form__content}>
+        {/* 항상 표시되는 QR 결제 추가 버튼 */}
+        <li className={styles.container__form__content}>
+          <Link href="/qrPayment/addQrPayment">
             <button className={styles.container__form__content__addBtn}>
               <div className={styles.container__form__content__addBtn__title}>
-                <span>
-                  <QrCode />
-                </span>
+                <span><QrCode /></span>
                 <span>QR 결제 추가하기</span>
               </div>
-
               <ChevronRight />
-
             </button>
-          </div>
-        </Link>
+          </Link>
+        </li>
 
-        {products.length > 0 ? (
-          products.map((product) => (
-
-            <li key={product.productId} className={styles.container__form__content}>
-              <Link href={`/linkPayment/${product.productId}`}>
-                <div className={styles.container__form__content__info}>
-                  <div className={styles.container__form__content__info__title}>
-                    <h3>{product.goodsNm}</h3>
-                    <p>{product.unitPrice} 원</p>
-                    {/* <p>{product.payType}</p> */}
-                    {/* <p>상품 ID: {product.productId}</p>
-              <p>상점 ID: {product.mid}</p> */}
-                  </div>
-                  <ChevronRight />
-                </div>
-              </Link>
-
-            </li>
-
-          ))
-        ) : (
-          <p>구입한 상품이 없습니다.</p>
+        {/* 로딩 중 표시 */}
+        {isLoading && (
+          <li className={styles.container__form__content}>
+            <p>불러오는 중...</p>
+          </li>
         )}
+
+        {/* 에러 표시 */}
+        {!isLoading && error && (
+          <li className={styles.container__form__content}>
+            <p style={{ color: "red" }}>{error}</p>
+          </li>
+        )}
+
+        {/* 상품 목록 */}
+        {!isLoading && !error && products.length > 0 && products.map((product) => (
+          <li key={product.productId} className={styles.container__form__content}>
+            <Link href={`/qrPayment/${product.productId}`}>
+              <div className={styles.container__form__content__info}>
+                <div className={styles.container__form__content__info__title}>
+                  <h3>{product.goodsNm}</h3>
+                  <p>{product.unitPrice} 원</p>
+                </div>
+                <ChevronRight />
+              </div>
+            </Link>
+          </li>
+        ))}
+
+        {/* 상품이 없을 경우 */}
+        {!isLoading && !error && products.length === 0 && (
+          <li className={styles.container__form__content}>
+            <p>구입한 상품이 없습니다.</p>
+          </li>
+        )}
+
       </ul>
     </div>
   );

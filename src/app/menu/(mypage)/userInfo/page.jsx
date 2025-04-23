@@ -1,105 +1,107 @@
-'use client';
-import { useRouter } from 'next/navigation';
+"use client";
+import { API_BASE_URL } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from './page.module.scss';
 import { Search } from 'lucide-react';
-import { useEffect, useState } from "react";
-import { fetchWithToken } from '@/lib/api';
 
-
-export default function UserInfo() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isBlocked, setIsBlocked] = useState(true);
+export default function UserList() {
+  const [users, setUsers] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState('');
 
+  const fetchUsers = async (businessNumber = "") => {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      setError("토큰이 없습니다.");
+      return;
+    }
 
+    setLoading(true);
+    setError("");
+
+    try {
+      const query = businessNumber ? `?businessNumber=${businessNumber}` : "";
+      const res = await fetch(`${API_BASE_URL}/api/admin/getUserList${query}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("사용자 목록 불러오기 실패");
+
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error(err);
+      setError("사용자 목록을 불러오는 중 오류 발생");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 검색어가 변경될 때마다 500ms 후 API 호출
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const data = await fetchWithToken('/api/user/myPage');
-        setUser(data);
-      } catch (err) {
-        console.error('사용자 정보 로드 실패:', err);
-        setError('로그인이 필요하거나 사용자 정보를 불러오지 못했습니다.');
-      }
-    };
+    const debounceTimer = setTimeout(() => {
+      fetchUsers(searchKeyword);
+    }, 500); // 디바운스 타이머 500ms
 
-    fetchUserInfo();
-  }, []);
-
-  if (error) {
-    return <div style={{ padding: '2rem', color: 'red' }}>{error}</div>;
-  }
-
-  if (!user) {
-    return <div style={{ padding: '2rem' }}>불러오는 중...</div>;
-  }
-
-
-  const handleClick = () => {
-    setIsBlocked((prev) => !prev);
-  };
-
-  const handleInputChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleCardClick = (userId) => {
-    router.push(`/menu/userInfo/userDetail/${userId}`);
-  };
+    return () => clearTimeout(debounceTimer); // 이전 타이머 제거
+  }, [searchKeyword]);
 
   const handleSearch = () => {
-    alert(`Searching for: ${searchTerm}`);
-    // You can replace the alert with your search logic
+    fetchUsers(search.trim());
   };
 
-  return <>
+  return (
     <div className={styles.container}>
       <div className={styles.container__search}>
-        <div className={styles.container__serach__input} style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
-          <Search
-            style={{
-              flex: 1,
-              position: 'absolute',
-              top: '50%',
-              left: '10px',
-              transform: 'translateY(-50%)',
-              color: '#888',
-            }}
-          />
-          <input
-            type="text"
-            placeholder="사업자등록번호로 찾기"
-            value={searchTerm}
-            onChange={handleInputChange}
-            style={{
-              padding: '8px 8px 8px 42px',
-            }}
-          />
-        </div>
-        <button className={styles.container__serach__btn} onClick={handleSearch}>검색</button>
+        <p className={styles.container__search__icon}><Search /></p>
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={(e) => {
+            const input = e.target.value;
+            // 숫자와 하이픈(-)만 허용
+            const onlyValid = input.replace(/[^0-9-]/g, "");
+            setSearchKeyword(onlyValid);
+          }} placeholder="사업자등록번호로 찾기 (예 : 123-45-67890)"
+        />
 
       </div>
 
-      <div className={styles.container__content}>
-        <div className={styles.container__content__card}>
-          <div
-            className={styles.container__content__card__info}
-            onClick={() => handleCardClick(user.userId)}
-            style={{ cursor: 'pointer' }}
-          >
-            <h3>{user.userName}</h3>
-            <p>{user.userId}</p>
-          </div>
-          <button
-            className={isBlocked ? "unblock" : "blocked"}
-            onClick={handleClick}
-          >
-            <h2>{isBlocked ? "차단하기" : "차단 풀기"}</h2>
-          </button>
+      {loading ? (
+        <p>로딩 중...</p>
+      ) : error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <div className={styles.container__content}>
+          {users.length > 0 ? (
+            users.map((user) => (
+              <ul
+                className={styles.container__content__item}
+                key={user.userId}
+                onClick={() =>
+                  router.push(`/menu/userInfo/${user.userId}`)}
+              >
+                <li className={styles.container__content__item__info}>
+                  <h3>{user.userName}</h3>
+                  <p>{user.userId}</p>
+                  <p>{user.businessNumber || "-"}</p>
+                  {/* <p>{user.userPhone}</p> */}
+                </li>
+                <h2 style={{ color: user.ban ? "var(--red700)" : "var(--green700)" }}>{user.ban ? "차단 중" : "사용 중"}</h2>
+              </ul>
+            ))
+          ) : (
+            <li>사용자가 없습니다.</li>
+          )}
         </div>
-      </div>
+
+      )}
     </div>
-  </>
+  );
 }

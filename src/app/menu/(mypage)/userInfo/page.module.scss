@@ -1,22 +1,35 @@
 .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-medium);
   &__search {
-    display: flex;
-    gap: var(--padding-medium);
-    padding-bottom: var(--padding-medium);
-    &__input {
-      input {
-      }
+    position: relative;
+    &__icon {
+      position: absolute;
+      left: var(--padding-small);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray5);
+      pointer-events: none;
     }
-    &__btn {
+    input {
+      width: 100%;
+      padding-left: 2.5rem;
     }
   }
   &__content {
-    &__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-medium);
+    &__item {
+      background-color: var(--white);
+      line-height: 2rem;
       padding: var(--padding-medium);
       border-radius: var(--radius-medium);
-      background-color: var(--white);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+
       &__info {
         display: flex;
         flex-direction: column;

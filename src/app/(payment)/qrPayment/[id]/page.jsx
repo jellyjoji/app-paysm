@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
 import { Copy } from 'lucide-react';
 
-export default function LinkPaymentDetail() {
+export default function QrPaymentDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
