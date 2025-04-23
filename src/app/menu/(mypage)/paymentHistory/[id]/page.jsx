@@ -1,10 +1,11 @@
 'use client';
 import styles from './page.module.scss';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { API_BASE_URL } from '@/lib/api';
 
 export default function PaymentDetail() {
+  const router = useRouter();
   const params = useParams();
   const paymentId = params.id;
 
@@ -57,17 +58,9 @@ export default function PaymentDetail() {
       return;
     }
     const { tid, amt } = paymentInfo;
-    window.open(`/payment/paymentCancel?tid=${tid}&amt=${amt}`, '_blank');
+    window.open(`${API_BASE_URL}/payment/paymentCancel?tid=${tid}&amt=${amt}`, '_blank');
   };
 
-  const viewReceipt = () => {
-    if (!paymentInfo) {
-      alert('결제 정보를 먼저 불러와야 합니다.');
-      return;
-    }
-    const { tid } = paymentInfo;
-    window.open(`/payment/receipt?tid=${tid}`, '_blank');
-  };
 
   return (
     <div className={styles.container}>
@@ -159,6 +152,13 @@ export default function PaymentDetail() {
                     ? '완료'
                     : '미완료'
               } readOnly
+
+              className={
+                paymentInfo.cancelYN === 'Y'
+                  ? 'statusCanceled'
+                  : paymentInfo.resultMsg === '정상처리'
+                    ? 'statusPending'
+                    : 'pending'}
             />
           </div>
 
@@ -175,7 +175,7 @@ export default function PaymentDetail() {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={viewReceipt}
+            onClick={() => router.push(`/menu/paymentHistory/${paymentId}/receipt`)}
           >
             영수증보기
           </button>

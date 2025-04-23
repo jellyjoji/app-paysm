@@ -17,6 +17,15 @@ export default function LinkPaymentDetail() {
     return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
   }, [id]);
 
+  // 결제 링크를 새로운 창에서 열기
+  const openPaymentPage = () => {
+    const paymentWindow = window.open(payLink, '_blank', 'width=800,height=600');
+    if (paymentWindow) {
+      paymentWindow.document.body.style.backgroundColor = '#f0f0f0'; // 새 창에서 배경색 변경
+      paymentWindow.document.body.style.fontFamily = 'Arial, sans-serif'; // 폰트 변경
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -99,6 +108,8 @@ export default function LinkPaymentDetail() {
         <div className={styles.container__form__content}>
           <label htmlFor="payLink">결제 링크</label>
           <textarea type="text" id="payLink" value={payLink} readOnly />
+          <button onClick={openPaymentPage}>결제 페이지 열기</button>
+
         </div>
 
         <button onClick={handleCopy}>

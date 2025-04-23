@@ -1,6 +1,6 @@
 "use client";
-import "./globals.scss";
-import Header from '@/components/Header';
+import "./globals.css";
+import Header from "@/components/Header";
 import CTAButton from "@/components/CtaButton";
 
 export default function RootLayout({ children }) {
@@ -8,9 +8,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Header />
-        <main>
-          {children}
-        </main>
+        <main>{children}</main>
         <CTAButton />
       </body>
     </html>
