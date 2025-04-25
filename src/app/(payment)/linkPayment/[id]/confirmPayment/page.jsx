@@ -3,10 +3,16 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { API_BASE_URL } from "@/lib/api";
-
+import Modal from 'react-modal';
 
 export default function ConfirmPaymentPage() {
   const params = useParams();
+  const [isOpen, setIsOpen] = useState(false);
+  // 모달 열기
+  const openModal = () => setIsOpen(true);
+  // 모달 닫기
+  const closeModal = () => setIsOpen(false);
+
   const productId = params.id;
 
   const [product, setProduct] = useState(null);
@@ -80,7 +86,18 @@ export default function ConfirmPaymentPage() {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">결제 확인</h2>
+      <div>
+        <button onClick={openModal}>모달 열기</button>
 
+        <Modal
+          isOpen={isOpen}             // 모달의 열림 상태
+          onRequestClose={closeModal} // 모달 닫기
+          contentLabel="모달 내용"   // 모달의 설명
+        >
+          <h2>모달 내용</h2>
+          <button onClick={closeModal}>모달 닫기</button>
+        </Modal>
+      </div>
       <div>
         <p>상품명: {product.goodsNm}</p>
         <p>단가: {formatPrice(product.unitPrice)}</p>
