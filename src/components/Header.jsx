@@ -6,7 +6,6 @@ import { House, ChevronLeft, Menu } from 'lucide-react';
 import styles from './Components.module.scss';
 import Image from "next/image";
 
-
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -24,6 +23,21 @@ export default function Header() {
       setTitle('결제 내역 상세');
       return;
     }
+
+    // if (path.startsWith('/linkPayment/') && path.endsWith('/confirmPayment')) {
+    //   setTitle('결제 요청하기');
+    //   return;
+    // }
+    // if (path.startsWith('/linkPayment/')) {
+    //   setTitle('링크 결제 상세보기');
+    //   return;
+    // }
+
+    // if (path.startsWith('/menu/userInfo/')) {
+    //   setTitle('회원정보 상세');
+    //   return;
+    // }
+
     switch (pathname) {
       case '/':
         setTitle('HOME');
@@ -50,7 +64,7 @@ export default function Header() {
         break;
 
       case '/menu/userInfo':
-        setTitle('UserInfo');
+        setTitle('회원 정보 조회');
         break;
 
       case '/menu/changePassword':
@@ -61,12 +75,24 @@ export default function Header() {
         setTitle('링크 결제');
         break;
 
+      case '/linkPayment/addLinkPayment':
+        setTitle('링크 결제 추가하기');
+        break;
+
       case '/manualPayment':
         setTitle('수기 결제');
         break;
 
+      case '/manualPayment/scanCard':
+        setTitle('카드 번호 스캔하기');
+        break;
+
       case '/qrPayment':
         setTitle('QR 결제');
+        break;
+
+      case '/qrPayment/addQrPayment':
+        setTitle('QR 결제 추가하기');
         break;
 
       default:

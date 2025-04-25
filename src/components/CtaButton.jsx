@@ -6,6 +6,7 @@ import styles from './Components.module.scss';
 export default function CTAButton() {
   const pathname = usePathname();
   const router = useRouter();
+  console.log('현재 pathname:', pathname);
 
   const handleClick = () => {
     switch (pathname.toLowerCase()) {
@@ -21,7 +22,11 @@ export default function CTAButton() {
         router.push('/paymentInfo');
         break;
 
-      case '/userInfo':
+      case '/menu/userInfo':
+        console.log('사용자 정보 수정 기능 실행');
+        break;
+
+      case '/menu/changePassword':
         console.log('사용자 정보 수정 기능 실행');
         break;
 
@@ -39,8 +44,10 @@ export default function CTAButton() {
         return '가입 완료';
       case '/menu':
         return '결제하러 가기';
-      case '/userInfo':
+      case '/menu/userInfo':
         return '정보 수정';
+      case '/menu/changePassword':
+        return '변경하기';
       default:
         return '버튼';
     }
@@ -61,6 +68,11 @@ export default function CTAButton() {
       );
   };
 
+  const visibleRoutes = ['/login', '/signup', '/menu', '/userInfo', '/changePassword'];
+  const isVisible = visibleRoutes.some(route =>
+    pathname.toLowerCase().endsWith(route)
+  );
+
   const handleSubClick = () => {
     if (pathname.toLowerCase() === '/login') router.push('/signup');
     if (pathname.toLowerCase() === '/signup') router.push('/login');
@@ -75,9 +87,16 @@ export default function CTAButton() {
           </button>
         </div>
       )}
-      <button className={styles.cta} onClick={handleClick}>
-        {getLabel()}
-      </button>
+
+      {/* 안보이는 이유는 header 와 연관이 있을까 */}
+      <button className={styles.cta} onClick={handleClick}>{getLabel()}</button>
+
+      {isVisible && (
+        <button className={styles.cta} onClick={handleClick}>
+          {getLabel()}
+        </button>
+      )}
+
     </div>
   );
 }
