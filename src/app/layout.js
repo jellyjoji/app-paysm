@@ -6,7 +6,7 @@ import CTAButton from "@/components/CtaButton";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body id="root">
         <Header />
         <main>{children}</main>
         <CTAButton />

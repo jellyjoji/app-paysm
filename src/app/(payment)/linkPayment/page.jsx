@@ -45,7 +45,7 @@ export default function LinkPayment() {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} >
       <ul className={styles.container__form}>
 
         {/* ✅ 항상 보이는: 링크 결제 추가 버튼 */}
