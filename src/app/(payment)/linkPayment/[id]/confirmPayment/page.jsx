@@ -89,21 +89,7 @@ export default function ConfirmPaymentPage() {
   if (!product) return <div>상품 정보를 불러오는 중...</div>;
 
   return (
-    <div className="p-4">
-      < h2 className="text-xl font-bold mb-4" > 결제 확인</h2 >
-      <div>
-        <button onClick={openModal}>모달 열기</button>
-
-        <Modal
-          isOpen={isOpen}             // 모달의 열림 상태
-          onRequestClose={closeModal} // 모달 닫기
-          contentLabel="모달 내용"   // 모달의 설명
-          appElement={document.getElementById('#root')}
-        >
-          <h2>모달 내용</h2>
-          <button onClick={closeModal}>모달 닫기</button>
-        </Modal>
-      </div>
+    <div>
       <div>
         <p>상품명: {product.goodsNm}</p>
         <p>단가: {formatPrice(product.unitPrice)}</p>
@@ -127,46 +113,64 @@ export default function ConfirmPaymentPage() {
           <input type="hidden" name="goodsAmt" value={totalAmount} />
           <input type="hidden" name="goodsNm" value={product.goodsNm} />
         </div>
-
-        {paymentInfo && (
-          <>
-            <form
-              ref={formRef}
-              method="post"
-              action="https://api.skyclassism.com/payInit_hash.do" // 결제 API URL
-              target="responseIframe" // 응답을 iframe에서 표시
-              className="mt-4 border p-3"
-            >
+      </div>
 
 
-              {/* form 에 넘겨줄 필수 데이터 값 */}
-              <input type="hidden" name="encData" value={paymentInfo.encData} />
-              <input type="hidden" name="ediDate" value={paymentInfo.ediDate} />
-              <input type="hidden" name="mid" value={paymentInfo.mid} />
-              <input type="hidden" name="ordNo" value={paymentInfo.ordNo} />
-              <input type="hidden" name="goodsNm" value={product.goodsNm} />
-              <input type="hidden" name="goodsAmt" value={totalAmount} />
-              <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl} />
-              <input type="hidden" name="charset" value="utf-8" />
 
-              <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-                결제 요청 제출
-              </button>
-            </form>
+      {paymentInfo && (
+        <>
+          <form
+            ref={formRef}
+            method="post"
+            action="https://api.skyclassism.com/payInit_hash.do" // 결제 API URL
+            target="responseIframe" // 응답을 iframe에서 표시
+            className="mt-4 border p-3"
+          >
 
-            {/* 결제 응답을 표시할 iframe */}
-            <div className="mt-6">
-              <h3 className="font-semibold mb-2">결제창</h3>
-              <iframe
-                name="responseIframe" // 폼의 target과 일치
-                title="결제 프레임"
-                width="100%"
-                height="100%"
-                className="border w-full"
-              ></iframe>
-            </div>
-          </>
-        )}
+
+            {/* form 에 넘겨줄 필수 데이터 값 */}
+            <input type="hidden" name="encData" value={paymentInfo.encData} />
+            <input type="hidden" name="ediDate" value={paymentInfo.ediDate} />
+            <input type="hidden" name="mid" value={paymentInfo.mid} />
+            <input type="hidden" name="ordNo" value={paymentInfo.ordNo} />
+            <input type="hidden" name="goodsNm" value={product.goodsNm} />
+            <input type="hidden" name="goodsAmt" value={totalAmount} />
+            <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl} />
+            <input type="hidden" name="charset" value="utf-8" />
+
+            <button type="submit" onClick={openModal}>
+              결제 요청 제출
+            </button>
+          </form>
+        </>
+      )}
+
+      <div>
+
+        <Modal
+          isOpen={isOpen}             // 모달의 열림 상태
+          onRequestClose={closeModal} // 모달 닫기
+          contentLabel="모달 내용"   // 모달의 설명
+          appElement={document.getElementById('#root')}
+        >
+
+          <button onClick={closeModal}>모달 닫기</button>
+
+          {/* 결제 응답을 표시할 iframe */}
+          <div className="mt-6">
+            <iframe
+              name="responseIframe" // 폼의 target과 일치
+              title="결제 프레임"
+              width="100%"
+              height="100%"
+              className="border w-full"
+              style={{
+                border: 'none',       // 경계선 없애기
+                height: '80vh',       // 80% 뷰포트 높이에 맞추기
+              }}
+            ></iframe>
+          </div>
+        </Modal>
       </div>
     </div >
   );
