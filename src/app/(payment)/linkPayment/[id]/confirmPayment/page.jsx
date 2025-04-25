@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { API_BASE_URL } from "@/lib/api";
 
+
 export default function ConfirmPaymentPage() {
   const params = useParams();
   const productId = params.id;
@@ -96,6 +97,14 @@ export default function ConfirmPaymentPage() {
 
         <p>총 결제금액: {formatPrice(totalAmount)}</p>
 
+        <div>
+          <input type="hidden" name="productId" value={productId} />
+          <input type="hidden" name="merchantId" value={product.merchantId} />
+          <input type="hidden" name="mid" value={product.mid} />
+          <input type="hidden" name="goodsAmt" value={totalAmount} />
+          <input type="hidden" name="goodsNm" value={product.goodsNm} />
+        </div>
+
         {paymentInfo && (
           <>
             <form
@@ -105,11 +114,17 @@ export default function ConfirmPaymentPage() {
               target="responseIframe" // 응답을 iframe에서 표시
               className="mt-4 border p-3"
             >
-              <input type="hidden" name="productId" value={productId} />
-              <input type="hidden" name="merchantId" value={product.merchantId} />
-              <input type="hidden" name="mid" value={product.mid} />
-              <input type="hidden" name="goodsAmt" value={totalAmount} />
+
+
+              {/* form 에 넘겨줄 필수 데이터 값 */}
+              <input type="hidden" name="encData" value={paymentInfo.encData} />
+              <input type="hidden" name="ediDate" value={paymentInfo.ediDate} />
+              <input type="hidden" name="mid" value={paymentInfo.mid} />
+              <input type="hidden" name="ordNo" value={paymentInfo.ordNo} />
               <input type="hidden" name="goodsNm" value={product.goodsNm} />
+              <input type="hidden" name="goodsAmt" value={totalAmount} />
+              <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl} />
+              <input type="hidden" name="charset" value="utf-8" />
 
               <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
                 결제 요청 제출
@@ -123,7 +138,7 @@ export default function ConfirmPaymentPage() {
                 name="responseIframe" // 폼의 target과 일치
                 title="결제 프레임"
                 width="100%"
-                height="500"
+                height="100%"
                 className="border w-full"
               ></iframe>
             </div>

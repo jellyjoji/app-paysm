@@ -2,12 +2,13 @@
 
 import styles from "./page.module.scss";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // useRouter 추가
 import { API_BASE_URL } from "@/lib/api";
 import { Copy } from 'lucide-react';
 
 export default function LinkPaymentDetail() {
   const { id } = useParams();
+  const router = useRouter(); // router 사용
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -23,11 +24,12 @@ export default function LinkPaymentDetail() {
 
   // 결제 링크를 새로운 창에서 열기
   const openPaymentPage = () => {
-    const paymentWindow = window.open(payLink, '_blank', 'width=800,height=600');
-    if (paymentWindow) {
-      paymentWindow.document.body.style.backgroundColor = '#f0f0f0'; // 새 창에서 배경색 변경
-      paymentWindow.document.body.style.fontFamily = 'Arial, sans-serif'; // 폰트 변경
-    }
+    // const paymentWindow = window.open(payLink, '_blank', 'width=800,height=600');
+    // if (paymentWindow) {
+    //   paymentWindow.document.body.style.backgroundColor = '#f0f0f0'; // 새 창에서 배경색 변경
+    //   paymentWindow.document.body.style.fontFamily = 'Arial, sans-serif'; // 폰트 변경
+    // }
+    router.push(payLink);
   };
 
   useEffect(() => {
