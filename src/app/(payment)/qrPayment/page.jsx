@@ -44,10 +44,8 @@ export default function QrPayment() {
   return (
     <div className={styles.container}>
       <ul className={styles.container__form}>
-
-        {/* 항상 표시되는 QR 결제 추가 버튼 */}
-        <li className={styles.container__form__content}>
-          <Link href="/qrPayment/addQrPayment">
+        <Link href="/qrPayment/addQrPayment">
+          <li className={styles.container__form__content}>
             <button className={styles.container__form__content__addBtn}>
               <div className={styles.container__form__content__addBtn__title}>
                 <span><QrCode /></span>
@@ -55,9 +53,8 @@ export default function QrPayment() {
               </div>
               <ChevronRight />
             </button>
-          </Link>
-        </li>
-
+          </li>
+        </Link>
         {/* 로딩 중 표시 */}
         {isLoading && (
           <li className={styles.container__form__content}>

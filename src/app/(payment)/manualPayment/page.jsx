@@ -30,21 +30,15 @@ export default function ManualPayment() {
 
   return <>
     <div className={styles.container}>
-
-
       <div className={styles.container__form} onSubmit={handleSubmit}>
-
         <Link href="/manualPayment/scanCard">
-
           <div className={styles.container__form__content}>
             <button className={styles.container__form__content__addBtn}>
               <div className={styles.container__form__content__addBtn__title}>
                 <span> <ScanLine /></span>
                 <span>카드 번호 스캔하기</span>
               </div>
-
               <ChevronRight />
-
             </button>
           </div>
         </Link>

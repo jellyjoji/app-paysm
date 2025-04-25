@@ -47,10 +47,8 @@ export default function LinkPayment() {
   return (
     <div className={styles.container} >
       <ul className={styles.container__form}>
-
-        {/* ✅ 항상 보이는: 링크 결제 추가 버튼 */}
-        <li className={styles.container__form__content}>
-          <Link href="/linkPayment/addLinkPayment">
+        <Link href="/linkPayment/addLinkPayment">
+          <li className={styles.container__form__content}>
             <button className={styles.container__form__content__addBtn}>
               <div className={styles.container__form__content__addBtn__title}>
                 <span><Link2 /></span>
@@ -58,8 +56,8 @@ export default function LinkPayment() {
               </div>
               <ChevronRight />
             </button>
-          </Link>
-        </li>
+          </li>
+        </Link>
 
         {/* ✅ 로딩 중일 때 표시 */}
         {isLoading && (

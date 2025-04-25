@@ -30,6 +30,11 @@
           gap: var(--padding-small);
         }
       }
+      &__copy {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
   }
 }

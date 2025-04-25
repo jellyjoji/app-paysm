@@ -1,9 +1,10 @@
 'use client';
-
+import styles from "./page.module.scss";
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { API_BASE_URL } from "@/lib/api";
 import Modal from 'react-modal';
+import Image from "next/image";
 
 export default function ConfirmPaymentPage() {
   const params = useParams();
@@ -89,22 +90,40 @@ export default function ConfirmPaymentPage() {
   if (!product) return <div>상품 정보를 불러오는 중...</div>;
 
   return (
-    <div>
-      <div>
-        <p>상품명: {product.goodsNm}</p>
-        <p>단가: {formatPrice(product.unitPrice)}</p>
+    <div className={styles.container}>
+      <div className={styles.container__title}>
+        <Image src="/confirmPayment.png" alt="결제 요청"
+          width={100}
+          height={100} />
+        <h3>결제 요청</h3>
+        <h1>{formatPrice(totalAmount)}</h1>
+      </div>
+      <div className={styles.container__content}>
+        <table>
+          <tbody>
+            <tr>
+              <td>상품명</td>
+              <td>{product.goodsNm}</td>
+            </tr>
+            <tr>
+              <td>단가</td>
+              <td>{formatPrice(product.unitPrice)}</td>
+            </tr>
+            <tr>
+              <td>수량</td>
+              <td>{goodsQty}</td>
+              {/* <td>
+                <input
+                  type="number"
+                  value={goodsQty}
+                  min={1}
+                  onChange={(e) => setGoodsQty(parseInt(e.target.value))}
+                />
+              </td> */}
+            </tr>
+          </tbody>
+        </table>
 
-        <label>수량:
-          <input
-            type="number"
-            value={goodsQty}
-            min={1}
-            onChange={(e) => setGoodsQty(parseInt(e.target.value))}
-            className="ml-2 border p-1"
-          />
-        </label>
-
-        <p>총 결제금액: {formatPrice(totalAmount)}</p>
 
         <div>
           <input type="hidden" name="productId" value={productId} />

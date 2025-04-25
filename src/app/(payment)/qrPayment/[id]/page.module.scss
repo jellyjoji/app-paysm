@@ -3,9 +3,6 @@
   flex-direction: column;
   align-items: center;
   gap: var(--padding-medium);
-  &__cardScan {
-  }
-
   &__form {
     display: flex;
     flex-direction: column;
@@ -29,6 +26,13 @@
           align-items: center;
           gap: var(--padding-small);
         }
+      }
+      &__qrcode {
+        background-color: var(--white);
+        padding: var(--padding-large);
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

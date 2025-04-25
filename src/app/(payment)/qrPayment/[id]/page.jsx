@@ -4,14 +4,14 @@ import styles from "./page.module.scss";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
-import { Copy } from 'lucide-react';
+import QRCode from 'qrcode';  // qrcode 라이브러리 추가
 
 export default function QrPaymentDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
-
+  const [qrcode, setQrcode] = useState(null);  // QR 코드 상태 추가
 
   const payLink = useMemo(() => {
     return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
@@ -36,35 +36,22 @@ export default function QrPaymentDetail() {
 
         const data = await res.json();
         setProduct(data);
+
+        // QR 코드 생성
+        QRCode.toDataURL(payLink, { width: 256 }, (err, url) => {
+          if (err) {
+            console.error("QR 코드 생성 실패:", err);
+          } else {
+            setQrcode(url);  // 생성된 QR 코드 URL을 상태에 저장
+          }
+        });
       } catch (err) {
         setError(err.message);
       }
     };
 
     fetchProductInfo();
-  }, [id]);
-
-
-  const handleCopy = async () => {
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(payLink);
-      } else {
-        const input = document.createElement("input");
-        document.body.appendChild(input);
-        input.value = payLink;
-        input.select();
-        document.execCommand("copy");
-        document.body.removeChild(input);
-      }
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (err) {
-      console.error("복사 실패:", err);
-      alert("복사에 실패했습니다.");
-    }
-  };
-
+  }, [id, payLink]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
   if (error) return <p>{error}</p>;
   if (!product) return <p>로딩 중...</p>;
 
@@ -96,18 +83,24 @@ export default function QrPaymentDetail() {
           <input type="text" id="mid" value={product.mid} readOnly />
         </div>
 
-        <div className={styles.container__form__content}>
+        {/* <div className={styles.container__form__content}>
           <label htmlFor="payLink">결제 링크</label>
           <textarea type="text" id="payLink" value={payLink} readOnly />
+        </div> */}
+
+        <div className={styles.container__form__content}>
+          <label htmlFor="payLink">QR 코드</label>
+          <div id="qrcode" className={styles.container__form__content__qrcode}>
+            {qrcode ? (
+              <img src={qrcode} alt="QR Code" />
+            ) : (
+              <p>QR 코드 생성 중...</p>
+            )}
+          </div>
         </div>
 
-        <button onClick={handleCopy}>
-          <Copy />
-        </button>
-        {copied && (
-          <p style={{ color: "green", marginTop: "8px" }}>복사됨!</p>
-        )}
       </div>
+
     </div>
   );
 }

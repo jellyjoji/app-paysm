@@ -24,11 +24,6 @@ export default function LinkPaymentDetail() {
 
   // 결제 링크를 새로운 창에서 열기
   const openPaymentPage = () => {
-    // const paymentWindow = window.open(payLink, '_blank', 'width=800,height=600');
-    // if (paymentWindow) {
-    //   paymentWindow.document.body.style.backgroundColor = '#f0f0f0'; // 새 창에서 배경색 변경
-    //   paymentWindow.document.body.style.fontFamily = 'Arial, sans-serif'; // 폰트 변경
-    // }
     router.push(payLink);
   };
 
@@ -73,7 +68,6 @@ export default function LinkPaymentDetail() {
         document.body.appendChild(input);
         input.value = payLink;
         input.select();
-        document.execCommand("copy");
         document.body.removeChild(input);
       }
       setCopied(true);
@@ -116,18 +110,21 @@ export default function LinkPaymentDetail() {
         </div>
 
         <div className={styles.container__form__content}>
-          <label htmlFor="payLink">결제 링크</label>
+          <div className={styles.container__form__content__copy}>
+            <label htmlFor="payLink">결제 링크</label>
+            <button onClick={handleCopy}>
+              {/* 툴팁 처리 */}
+              {copied && (
+                <p>복사됨!</p>
+              )}
+              <Copy />
+            </button>
+
+          </div>
           <textarea type="text" id="payLink" value={payLink} readOnly />
           <button onClick={openPaymentPage}>결제 요쳥 열기</button>
 
         </div>
-
-        <button onClick={handleCopy}>
-          <Copy />
-        </button>
-        {copied && (
-          <p style={{ color: "green", marginTop: "8px" }}>복사됨!</p>
-        )}
       </div>
     </div>
   );
