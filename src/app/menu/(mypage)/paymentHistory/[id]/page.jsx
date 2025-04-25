@@ -175,7 +175,7 @@ export default function PaymentDetail() {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={() => router.push(`/menu/paymentHistory/${paymentId}/receipt`)}
+            onClick={() => router.push(`/menu/paymentHistory/${paymentInfo.tid}/receipt`)}
           >
             영수증보기
           </button>

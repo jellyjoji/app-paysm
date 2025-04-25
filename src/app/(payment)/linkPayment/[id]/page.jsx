@@ -12,10 +12,14 @@ export default function LinkPaymentDetail() {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
 
-
+  // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
-    return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
+    // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
+    return `/linkPayment/${id}/confirmPayment`;
   }, [id]);
+  // 근데 이 주소가 아니라 내 주소로 연결시켜서 열어야하잖아? data fetch 만 해오기 
+
+  console.log("payLink:" + payLink);
 
   // 결제 링크를 새로운 창에서 열기
   const openPaymentPage = () => {
@@ -41,17 +45,21 @@ export default function LinkPaymentDetail() {
           },
         });
 
+        console.log("res:" + res);
         if (!res.ok) throw new Error("상품 정보를 가져오지 못했습니다.");
 
         const data = await res.json();
+        console.log("data:" + data);
+
         setProduct(data);
       } catch (err) {
         setError(err.message);
       }
     };
-
     fetchProductInfo();
   }, [id]);
+
+
 
 
   const handleCopy = async () => {
@@ -108,7 +116,7 @@ export default function LinkPaymentDetail() {
         <div className={styles.container__form__content}>
           <label htmlFor="payLink">결제 링크</label>
           <textarea type="text" id="payLink" value={payLink} readOnly />
-          <button onClick={openPaymentPage}>결제 페이지 열기</button>
+          <button onClick={openPaymentPage}>결제 요쳥 열기</button>
 
         </div>
 

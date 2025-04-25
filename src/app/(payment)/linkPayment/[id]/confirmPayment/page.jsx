@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { API_BASE_URL } from "@/lib/api";
 
 export default function ConfirmPaymentPage() {
-  const params = useSearchParams();
-  const productId = params.get("productId");
-  console.log(productId);
-  console.log("productId 가 URL 에 없는 중/왜 없지");
+  const params = useParams();
+  const productId = params.id;
 
   const [product, setProduct] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [goodsQty, setGoodsQty] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState(null);
+
+  const formRef = useRef(null);
 
   // 상품 정보 불러오기
   useEffect(() => {
@@ -27,12 +27,12 @@ export default function ConfirmPaymentPage() {
       })
       .then((data) => {
         setProduct(data);
-        setTotalAmount(data.unitPrice); // 초기 결제금액 설정
+        setTotalAmount(data.unitPrice); // 초기 금액 설정
       })
       .catch((err) => setError(err.message));
   }, [productId]);
 
-  // 수량 변경 시 결제금액 갱신
+  // 총 결제금액 계산
   useEffect(() => {
     if (product) {
       const price = parseInt(product.unitPrice || 0);
@@ -40,27 +40,37 @@ export default function ConfirmPaymentPage() {
     }
   }, [goodsQty, product]);
 
-  // 결제 정보 요청
-  const fetchPaymentInfo = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/payment/getPaymentinfo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId,
-          merchantId: product.merchantId,
-          mid: product.mid,
-          goodsAmt: totalAmount,
-          goodsNm: product.goodsNm,
-        }),
-      });
+  // 결제 정보 자동 요청
+  useEffect(() => {
+    if (!product || !totalAmount) return;
 
-      if (!res.ok) throw new Error('결제정보 요청 실패');
-      const data = await res.json();
-      setPaymentInfo(data);
-    } catch (err) {
-      setError(err.message);
-    }
+    const fetchPaymentInfo = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/payment/getPaymentinfo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId,
+            merchantId: product.merchantId,
+            mid: product.mid,
+            goodsAmt: totalAmount,
+            goodsNm: product.goodsNm,
+          }),
+        });
+
+        if (!res.ok) throw new Error('결제정보 요청 실패');
+        const data = await res.json();
+        setPaymentInfo(data);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchPaymentInfo();
+  }, [product, totalAmount]);
+
+  const formatPrice = (value) => {
+    return value.toLocaleString('ko-KR') + '원';
   };
 
   if (error) return <div>오류: {error}</div>;
@@ -72,7 +82,7 @@ export default function ConfirmPaymentPage() {
 
       <div>
         <p>상품명: {product.goodsNm}</p>
-        <p>가격: {product.unitPrice}원</p>
+        <p>단가: {formatPrice(product.unitPrice)}</p>
 
         <label>수량:
           <input
@@ -80,19 +90,44 @@ export default function ConfirmPaymentPage() {
             value={goodsQty}
             min={1}
             onChange={(e) => setGoodsQty(parseInt(e.target.value))}
+            className="ml-2 border p-1"
           />
         </label>
 
-        <p>총 결제금액: {totalAmount}원</p>
-
-        <button onClick={fetchPaymentInfo}>결제 정보 요청</button>
+        <p>총 결제금액: {formatPrice(totalAmount)}</p>
 
         {paymentInfo && (
-          <div className="mt-4">
-            <h4>결제 준비 완료</h4>
-            <pre>{JSON.stringify(paymentInfo, null, 2)}</pre>
-            {/* 실제 결제 submit은 form으로 하거나 iframe 호출 등 필요 시 추가 */}
-          </div>
+          <>
+            <form
+              ref={formRef}
+              method="post"
+              action="https://api.skyclassism.com/payInit_hash.do" // 결제 API URL
+              target="responseIframe" // 응답을 iframe에서 표시
+              className="mt-4 border p-3"
+            >
+              <input type="hidden" name="productId" value={productId} />
+              <input type="hidden" name="merchantId" value={product.merchantId} />
+              <input type="hidden" name="mid" value={product.mid} />
+              <input type="hidden" name="goodsAmt" value={totalAmount} />
+              <input type="hidden" name="goodsNm" value={product.goodsNm} />
+
+              <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
+                결제 요청 제출
+              </button>
+            </form>
+
+            {/* 결제 응답을 표시할 iframe */}
+            <div className="mt-6">
+              <h3 className="font-semibold mb-2">결제창</h3>
+              <iframe
+                name="responseIframe" // 폼의 target과 일치
+                title="결제 프레임"
+                width="100%"
+                height="500"
+                className="border w-full"
+              ></iframe>
+            </div>
+          </>
         )}
       </div>
     </div>
