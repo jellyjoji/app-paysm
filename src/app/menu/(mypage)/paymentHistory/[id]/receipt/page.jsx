@@ -1,7 +1,6 @@
 'use client';
-
+import styles from "./page.module.scss";
 import { useEffect, useState } from 'react';
-
 import { API_BASE_URL } from "@/lib/api";
 import { use } from 'react';
 
@@ -45,12 +44,11 @@ export default function ReceiptPage({ params }) {
   }, [tid]);
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">결제 영수증</h2>
+    <div className={styles.container}>
 
       {error && <p className="text-danger text-center">{error}</p>}
 
-      <table className="table table-bordered">
+      <table>
         <tbody>
           {receipt &&
             Object.entries(receipt).map(([key, value]) => (
@@ -61,12 +59,6 @@ export default function ReceiptPage({ params }) {
             ))}
         </tbody>
       </table>
-
-      <div className="text-center">
-        <button onClick={() => window.close()} className="btn btn-secondary">
-          닫기
-        </button>
-      </div>
     </div>
   );
 }

@@ -102,15 +102,15 @@ export default function ConfirmPaymentPage() {
         <table>
           <tbody>
             <tr>
-              <td>상품명</td>
+              <th>상품명</th>
               <td>{product.goodsNm}</td>
             </tr>
             <tr>
-              <td>단가</td>
+              <th>단가</th>
               <td>{formatPrice(product.unitPrice)}</td>
             </tr>
             <tr>
-              <td>수량</td>
+              <th>수량</th>
               <td>{goodsQty}</td>
               {/* <td>
                 <input

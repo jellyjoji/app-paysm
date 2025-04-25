@@ -78,7 +78,7 @@ export default function PaymentDetail() {
             />
           </div>
 
-          <div className={styles.container__content}>
+          {/* <div className={styles.container__content}>
             <label htmlFor="paymentId" >
               거래 ID
             </label>
@@ -88,7 +88,7 @@ export default function PaymentDetail() {
               value={paymentInfo.paymentId || ''}
               readOnly
             />
-          </div>
+          </div> */}
 
           <div className={styles.container__content}>
             <label htmlFor="amt" >
@@ -157,8 +157,8 @@ export default function PaymentDetail() {
                 paymentInfo.cancelYN === 'Y'
                   ? 'statusCanceled'
                   : paymentInfo.resultMsg === '정상처리'
-                    ? 'statusPending'
-                    : 'pending'}
+                    ? 'statusDone'
+                    : 'statusPending'}
             />
           </div>
 

@@ -18,10 +18,13 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: var(--padding-small);
-      tr td:nth-child(1) {
+
+      tr th {
         color: var(--gray3);
+        font-weight: var(--text-weight-small);
+        text-align: left;
       }
-      tr td:nth-child(2) {
+      tr td {
         text-align: right;
       }
     }
