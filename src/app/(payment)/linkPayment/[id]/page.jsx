@@ -18,7 +18,6 @@ export default function LinkPaymentDetail() {
     // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
     return `/linkPayment/${id}/confirmPayment`;
   }, [id]);
-  // 근데 이 주소가 아니라 내 주소로 연결시켜서 열어야하잖아? data fetch 만 해오기 
 
   console.log("payLink:" + payLink);
 

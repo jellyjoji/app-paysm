@@ -7,6 +7,8 @@ import Modal from 'react-modal';
 import Image from "next/image";
 
 export default function ConfirmPaymentPage() {
+
+  
   const params = useParams();
   const [isOpen, setIsOpen] = useState(false);
   // 모달 열기
@@ -64,17 +66,29 @@ export default function ConfirmPaymentPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             productId,
-            merchantId: product.merchantId,
-            mid: product.mid,
+            merchantId: product.merchantId || 'MID-074ee10a-cbc0-4011-b258-d572af22718c',
+            mid: product.mid || 'paysmtestm',
             goodsAmt: totalAmount,
             goodsNm: product.goodsNm,
+            
           }),
         });
 
         if (!res.ok) throw new Error('결제정보 요청 실패');
         const data = await res.json();
+        console.log('응답 데이터:', data);  // 응답 데이터 확인
         setPaymentInfo(data);
+
+              // 결제 상태 체크 후 리디렉션
+      if (data.status === "success") {
+        window.location.href = "/success";  // 결제 성공 페이지로 이동
+      } else {
+        console.log("결제 실패");
+        
+        // window.location.href = "/failure";  // 결제 실패 페이지로 이동
+      }
       } catch (err) {
+        console.error('응답 처리 중 오류 발생:', err);
         setError(err.message);
       }
     };
@@ -112,14 +126,14 @@ export default function ConfirmPaymentPage() {
             <tr>
               <th>수량</th>
               <td>{goodsQty}</td>
-              {/* <td>
-                <input
+              <td>
+                {/* <input
                   type="number"
                   value={goodsQty}
                   min={1}
                   onChange={(e) => setGoodsQty(parseInt(e.target.value))}
-                />
-              </td> */}
+                /> */}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -129,12 +143,10 @@ export default function ConfirmPaymentPage() {
           <input type="hidden" name="productId" value={productId} />
           <input type="hidden" name="merchantId" value={product.merchantId} />
           <input type="hidden" name="mid" value={product.mid} />
-          <input type="hidden" name="goodsAmt" value={totalAmount} />
           <input type="hidden" name="goodsNm" value={product.goodsNm} />
+          <input type="hidden" name="goodsAmt" value={totalAmount} />
         </div>
       </div>
-
-
 
       {paymentInfo && (
         <>
@@ -143,21 +155,33 @@ export default function ConfirmPaymentPage() {
             method="post"
             action="https://api.skyclassism.com/payInit_hash.do" // 결제 API URL
             target="responseIframe" // 응답을 iframe에서 표시
-            className="mt-4 border p-3"
           >
 
-
             {/* form 에 넘겨줄 필수 데이터 값 */}
+            <input type="hidden" name="merchantId" value={paymentInfo.merchantId || 'MID-074ee10a-cbc0-4011-b258-d572af22718c'} />
+            <input type="hidden" name="unitPrice" value={product.unitPrice || totalAmount} />
+            <input type="hidden" name="goodsAmt" value={totalAmount} />
             <input type="hidden" name="encData" value={paymentInfo.encData} />
             <input type="hidden" name="ediDate" value={paymentInfo.ediDate} />
             <input type="hidden" name="mid" value={paymentInfo.mid} />
             <input type="hidden" name="ordNo" value={paymentInfo.ordNo} />
             <input type="hidden" name="goodsNm" value={product.goodsNm} />
-            <input type="hidden" name="goodsAmt" value={totalAmount} />
-            <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl} />
-            <input type="hidden" name="charset" value="utf-8" />
+            <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl || `${API_BASE_URL}/success`} />
+            {/* <input type="hidden" name="returnUrl" value="http://192.168.1.8:8080/payment/paymentAppRes" /> */}
+            <input type="hidden" name="payMethod" value="card" />
 
-            <button type="submit" onClick={openModal}>
+            {/* 선택사항 */}
+            <input type="hidden" name="ordNm" value="" placeholder="구매자명"  />
+            <input type="hidden" name="ordTel" value="01000000000" placeholder="구매자연락처"  />
+            <input type="hidden" name="ordEmail" value="" placeholder="구매자이메일"  />
+            <input type="hidden" name="userIp" value="" value={window.location.hostname}  />
+            <input type="hidden" name="mbsUsrId" value="고객명" placeholder="고객명"/>
+            {/* <input type="hidden" name="returnUrl" value={`${API_BASE_URL}/success`} /> */}
+            <input type="hidden" name="trxCd" value="0" />
+            <input type="hidden" name="charSet" value="UTF-8"/>
+            <input type="hidden" name="mbsReserved" value="reservedField"/>
+
+            <button type="submit" onClick={openModal} >
               결제 요청 제출
             </button>
           </form>
@@ -172,21 +196,24 @@ export default function ConfirmPaymentPage() {
           contentLabel="모달 내용"   // 모달의 설명
           appElement={document.getElementById('#root')}
         >
-
           <button onClick={closeModal}>모달 닫기</button>
 
           {/* 결제 응답을 표시할 iframe */}
-          <div className="mt-6">
+          <div>
             <iframe
               name="responseIframe" // 폼의 target과 일치
               title="결제 프레임"
               width="100%"
-              height="100%"
-              className="border w-full"
+              height="100vh"
               style={{
-                border: 'none',       // 경계선 없애기
-                height: '80vh',       // 80% 뷰포트 높이에 맞추기
+                height:'100vh',
+                border: 'none',     
+                zIndex: 9999,   
+    position: 'relative'
               }}
+              sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation"
+
+              
             ></iframe>
           </div>
         </Modal>

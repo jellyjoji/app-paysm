@@ -9,6 +9,7 @@
     line-height: 2rem;
     &__item {
       cursor: pointer;
+      padding: var(--padding-small) 0;
     }
   }
 }

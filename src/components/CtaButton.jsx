@@ -89,7 +89,7 @@ export default function CTAButton() {
       )}
 
       {/* 안보이는 이유는 header 와 연관이 있을까 */}
-      <button className={styles.cta} onClick={handleClick}>{getLabel()}</button>
+      {/* <button className={styles.cta} onClick={handleClick}>{getLabel()}</button> */}
 
       {isVisible && (
         <button className={styles.cta} onClick={handleClick}>
