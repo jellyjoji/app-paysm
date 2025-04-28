@@ -12,7 +12,18 @@ export default function LinkPaymentDetail() {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [token, setToken] = useState(null);
 
+
+  console.log('id:'+id);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("jwtToken");
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
+  
   // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
     // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
@@ -27,7 +38,14 @@ export default function LinkPaymentDetail() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
+
+    // const token = localStorage.getItem("jwtToken");
+    
+    if (!id || !token) {
+      console.log("id나 token이 아직 준비 안 됐음");
+      return;
+    }
+
     if (!token) {
       setError("로그인이 필요합니다.");
       return;
@@ -53,9 +71,7 @@ export default function LinkPaymentDetail() {
       }
     };
     fetchProductInfo();
-  }, [id]);
-
-
+  }, [id, token]);
 
 
   const handleCopy = async () => {

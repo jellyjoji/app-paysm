@@ -12,13 +12,26 @@ export default function QrPaymentDetail() {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [qrcode, setQrcode] = useState(null);  // QR 코드 상태 추가
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("jwtToken");
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
 
   const payLink = useMemo(() => {
     return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
   }, [id]);
 
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
+    // const token = localStorage.getItem("jwtToken");
+    if (!id || !token) {
+      console.log("id나 token이 아직 준비 안 됐음");
+      return;
+    }
+
     if (!token) {
       setError("로그인이 필요합니다.");
       return;
@@ -51,7 +64,8 @@ export default function QrPaymentDetail() {
     };
 
     fetchProductInfo();
-  }, [id, payLink]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
+  }, [id, token]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
+  
   if (error) return <p>{error}</p>;
   if (!product) return <p>로딩 중...</p>;
 
@@ -89,7 +103,7 @@ export default function QrPaymentDetail() {
         </div> */}
 
         <div className={styles.container__form__content}>
-          <label htmlFor="payLink">QR 코드</label>
+          <label htmlFor="qrcode">QR 코드</label>
           <div id="qrcode" className={styles.container__form__content__qrcode}>
             {qrcode ? (
               <img src={qrcode} alt="QR Code" />
