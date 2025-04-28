@@ -21,15 +21,24 @@ export default function ConfirmPaymentPage() {
     Modal.setAppElement('#root');
   }, []);
 
-  const productId = params.id;
+  // const productId = params.id;
+  const [productId, setProductId] = useState(null);  // 🔥 params.id 안정적으로 관리
+
 
   const [product, setProduct] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [goodsQty, setGoodsQty] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState(null);
-
   const formRef = useRef(null);
+
+    // params.id가 준비되면 productId에 세팅
+    useEffect(() => {
+      if (params?.id) {
+        setProductId(params.id);
+      }
+    }, [params]);
+  
 
   // 상품 정보 불러오기
   useEffect(() => {
