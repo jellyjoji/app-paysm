@@ -13,6 +13,46 @@ export default function ConfirmPaymentPage() {
   const closeModal = () => setIsOpen(false);
 
   useEffect(() => {
+    const handleMessage = (event) => {
+      if (!event.data) return;
+  
+      try {
+        console.log("Received data from iframe:", event.data);
+  
+        const data = event.data;
+        const receivedData = Array.isArray(data) ? data[1] : data;
+  
+        // 필수 필드 확인 (예: encData 등)
+        if (receivedData?.encData) {
+          paymentRequest(receivedData)
+            .then((result) => {
+              if (result.resultCd === "0000") {
+                // 결제 성공 시 처리
+                paymentSuccess(formRef.current, receivedData);
+              } else {
+                alert("결제 실패: " + result.resultMsg);
+              }
+            })
+            .catch((err) => {
+              alert("결제 요청 중 오류 발생: " + err.message);
+            });
+        } else {
+          console.warn("수신된 데이터에 encData 없음", receivedData);
+        }
+  
+      } catch (err) {
+        console.error("메시지 처리 중 오류:", err);
+      }
+    };
+  
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+  
+
+  useEffect(() => {
     Modal.setAppElement('#root');
   }, []);
 

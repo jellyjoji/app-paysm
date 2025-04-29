@@ -9,5 +9,12 @@
     input {
       width: 100%;
     }
+    position: relative;
+
+    &__eye {
+      position: absolute;
+      right: 0;
+      bottom: -0.7rem;
+    }
   }
 }
