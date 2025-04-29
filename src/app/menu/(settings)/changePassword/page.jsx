@@ -124,7 +124,7 @@ export default function ChangePassword() {
         </div>
       </div>
 
-      <button type="submit">비밀번호 변경</button>
+      <button type="submit" className="cta">비밀번호 변경</button>
     </form>
   );
 }

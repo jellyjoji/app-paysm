@@ -15,13 +15,13 @@ export default function ConfirmPaymentPage() {
   useEffect(() => {
     const handleMessage = (event) => {
       if (!event.data) return;
-  
+
       try {
         console.log("Received data from iframe:", event.data);
-  
+
         const data = event.data;
         const receivedData = Array.isArray(data) ? data[1] : data;
-  
+
         // 필수 필드 확인 (예: encData 등)
         if (receivedData?.encData) {
           paymentRequest(receivedData)
@@ -39,18 +39,18 @@ export default function ConfirmPaymentPage() {
         } else {
           console.warn("수신된 데이터에 encData 없음", receivedData);
         }
-  
+
       } catch (err) {
         console.error("메시지 처리 중 오류:", err);
       }
     };
-  
+
     window.addEventListener("message", handleMessage);
     return () => {
       window.removeEventListener("message", handleMessage);
     };
   }, []);
-  
+
 
   useEffect(() => {
     Modal.setAppElement('#root');
@@ -103,7 +103,7 @@ export default function ConfirmPaymentPage() {
         notiUrl: receivedData?.notiUrl || "https://example.com/notify",
         payMethod: receivedData?.payMethod || "CARD",
       };
-  
+
       const formData = new URLSearchParams();
       for (const key in receivedData) {
         formData.append(key, receivedData[key]);
@@ -279,7 +279,7 @@ export default function ConfirmPaymentPage() {
           <input type="hidden" name="charSet" value="UTF-8" />
           <input type="hidden" name="mbsReserved" value="reservedField" />
 
-          <button type="submit" onClick={openModal}>
+          <button className='cta' type="submit" onClick={openModal}>
             결제 요청 제출
           </button>
         </form>

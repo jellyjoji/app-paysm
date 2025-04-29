@@ -92,7 +92,7 @@ export default function PaymentInfo() {
   };
 
   return <div className={styles.container}>
-    <div className={styles.container__segmentedControl}>
+    {/* <div className={styles.container__segmentedControl}>
       <div className={styles.container__segmentedControl__content}>
         <button
           className={`${styles.container__segmentedControl__content__option} ${selectedIndex === 0 ? styles.active : ''}`}
@@ -109,7 +109,7 @@ export default function PaymentInfo() {
           수기 결제
         </button>
       </div>
-    </div>
+    </div> */}
     <div className={styles.container__content}>
       <label htmlFor="mid">Merchant ID</label>
       <input
@@ -133,9 +133,9 @@ export default function PaymentInfo() {
     </div>
 
     {isEditMode ? (
-      <button onClick={handleSubmit}>등록</button>
+      <button className='cta' onClick={handleSubmit}>등록</button>
     ) : (
-      <button onClick={() => setIsEditMode(true)}>수정</button>
+      <button className='cta' onClick={() => setIsEditMode(true)}>수정</button>
     )}
   </div >
 }

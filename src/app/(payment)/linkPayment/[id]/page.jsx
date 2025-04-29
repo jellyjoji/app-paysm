@@ -15,7 +15,7 @@ export default function LinkPaymentDetail() {
   const [token, setToken] = useState(null);
 
 
-  console.log('id:'+id);
+  console.log('id:' + id);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("jwtToken");
@@ -23,7 +23,7 @@ export default function LinkPaymentDetail() {
       setToken(savedToken);
     }
   }, []);
-  
+
   // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
     // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
@@ -40,7 +40,7 @@ export default function LinkPaymentDetail() {
   useEffect(() => {
 
     // const token = localStorage.getItem("jwtToken");
-    
+
     if (!id || !token) {
       console.log("id나 token이 아직 준비 안 됐음");
       return;
@@ -137,7 +137,7 @@ export default function LinkPaymentDetail() {
 
           </div>
           <textarea type="text" id="payLink" value={payLink} readOnly />
-          <button onClick={openPaymentPage}>결제 요쳥 열기</button>
+          <button className='cta' onClick={openPaymentPage}>결제 요쳥</button>
 
         </div>
       </div>

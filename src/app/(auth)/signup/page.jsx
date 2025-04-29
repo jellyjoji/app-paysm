@@ -95,7 +95,7 @@ export default function Signup() {
           </button>
 
         </div>
-        <button type="submit">회원가입</button>
+        <button className='cta' type="submit">회원가입</button>
         {message && (
           <p style={{ color: message.includes("완료") ? "green" : "red" }}>
             {message}

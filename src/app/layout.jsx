@@ -1,7 +1,7 @@
 "use client";
 import "./globals.css";
 import Header from "@/components/Header";
-import CTAButton from "@/components/CtaButton";
+// import CTAButton from "@/components/CtaButton";
 
 export default function RootLayout({ children }) {
   return (
@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
       <body id="root">
         <Header />
         <main>{children}</main>
-        <CTAButton />
+        {/* <CTAButton /> */}
       </body>
     </html>
   );

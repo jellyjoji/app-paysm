@@ -185,3 +185,10 @@ textarea {
   padding-left: 1rem;
   border-radius: var(--radius-small);
 }
+
+.cta {
+  color: var(--white);
+  background-color: var(--color-primary);
+  border-radius: var(--radius-medium);
+  text-align: center;
+}

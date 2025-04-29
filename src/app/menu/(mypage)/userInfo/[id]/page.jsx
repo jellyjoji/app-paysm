@@ -143,7 +143,7 @@ export default function UserDetail() {
         </div>
 
         <div>
-          <button type="button" onClick={handleSave}>저장</button>
+          <button className='cta' type="button" onClick={handleSave}>저장</button>
         </div>
       </form >
     </div >

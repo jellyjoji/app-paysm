@@ -85,7 +85,7 @@ export default function AddQrPayment() {
           />
         </div>
 
-        <button type="submit">상품 등록</button>
+        <button className='cta' type="submit">상품 등록</button>
       </form>
     </div>
   );

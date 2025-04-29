@@ -93,7 +93,7 @@ export default function Login() {
             로그인 기억하기
           </label>
         </div>
-        <button onClick={handleLogin}>로그인</button>
+        <button className='cta' onClick={handleLogin}>로그인</button>
         <p >{msg}</p>
       </form>
     </div>
