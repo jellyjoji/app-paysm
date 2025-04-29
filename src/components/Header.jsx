@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { House, ChevronLeft, Menu } from 'lucide-react';
-import styles from './Components.module.scss';
+import styles from './components.module.scss';
 import Image from "next/image";
 
 export default function Header() {
