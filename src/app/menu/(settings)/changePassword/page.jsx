@@ -55,9 +55,10 @@ export default function ChangePassword() {
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
 
+      {/* 현재 비밀번호 */}
       <div className={styles.container__content}>
         <label htmlFor="currentPassword">현재 비밀번호</label>
-        <div className={styles.container__content__inputWrap}>
+        <div>
           <input
             type={showCurrentPassword ? "text" : "password"}
             id="currentPassword"
@@ -70,15 +71,17 @@ export default function ChangePassword() {
             type="button"
             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
             className={styles.container__content__eye}
+            aria-label={showCurrentPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
           >
             {showCurrentPassword ? <EyeClosed /> : <Eye />}
           </button>
         </div>
       </div>
 
+      {/* 새 비밀번호 */}
       <div className={styles.container__content}>
         <label htmlFor="newPassword">새 비밀번호</label>
-        <div className={styles.container__content__inputWrap}>
+        <div>
           <input
             type={showNewPassword ? "text" : "password"}
             id="newPassword"
@@ -91,15 +94,17 @@ export default function ChangePassword() {
             type="button"
             onClick={() => setShowNewPassword(!showNewPassword)}
             className={styles.container__content__eye}
+            aria-label={showNewPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
           >
             {showNewPassword ? <EyeClosed /> : <Eye />}
           </button>
         </div>
       </div>
 
+      {/* 새 비밀번호 확인 */}
       <div className={styles.container__content}>
         <label htmlFor="confirmPassword">새 비밀번호 확인</label>
-        <div className={styles.container__content__inputWrap}>
+        <div>
           <input
             type={showConfirmPassword ? "text" : "password"}
             id="confirmPassword"
@@ -112,6 +117,7 @@ export default function ChangePassword() {
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className={styles.container__content__eye}
+            aria-label={showConfirmPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
           >
             {showConfirmPassword ? <EyeClosed /> : <Eye />}
           </button>
