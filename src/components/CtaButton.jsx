@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import styles from './components.module.scss';
+import styles from './test.module.scss';
 
 export default function CTAButton() {
   const pathname = usePathname();

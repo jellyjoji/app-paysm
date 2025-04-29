@@ -1,5 +1,5 @@
 "use client";
-import styles from './components.module.scss';
+import styles from './test.module.scss';
 
 export default function Modal({
   title = "확인",
