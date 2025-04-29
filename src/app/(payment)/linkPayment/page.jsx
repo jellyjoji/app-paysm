@@ -9,6 +9,21 @@ export default function LinkPayment() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // ✅ 로딩 상태 추가
+  
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const res = await fetch(`${API_BASE_URL}/api/product/productList`);
+  //       if (!res.ok) throw new Error("상품 목록 불러오기 실패");
+  //       const data = await res.json();
+  //       setProducts(data.products); // API 응답에 따라 수정
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   fetchProducts(); // 페이지 로드될 때 무조건 상품 리스트 fetch
+  // }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
