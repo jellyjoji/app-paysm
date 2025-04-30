@@ -96,7 +96,7 @@ export default function Header() {
         break;
 
       default:
-        setTitle('페이지 경로없음');
+        setTitle('');
     }
   }, [pathname]);
 
