@@ -10,7 +10,6 @@ export default function QrPaymentDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
-  const [copied, setCopied] = useState(false);
   const [qrcode, setQrcode] = useState(null);  // QR 코드 상태 추가
   const [token, setToken] = useState(null);
 
@@ -23,10 +22,10 @@ export default function QrPaymentDetail() {
 
   const payLink = useMemo(() => {
     return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
+    // return `/linkPayment/${id}/confirmPayment`;
   }, [id]);
 
   useEffect(() => {
-    // const token = localStorage.getItem("jwtToken");
     if (!id || !token) {
       console.log("id나 token이 아직 준비 안 됐음");
       return;
@@ -39,6 +38,7 @@ export default function QrPaymentDetail() {
 
     const fetchProductInfo = async () => {
       try {
+        const token = localStorage.getItem("jwtToken");
         const res = await fetch(`${API_BASE_URL}/api/product/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,8 +64,8 @@ export default function QrPaymentDetail() {
     };
 
     fetchProductInfo();
-  }, [id, token]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
-  
+  }, [id, token, payLink]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
+
   if (error) return <p>{error}</p>;
   if (!product) return <p>로딩 중...</p>;
 

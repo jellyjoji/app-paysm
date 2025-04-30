@@ -47,9 +47,10 @@ export default function AddLinkPayment() {
 
       // 상품 등록 성공 메시지와 페이지 리다이렉트
       alert(result.message);
-      if (result.code === 200) {
 
+      if (result.code == 200) {
         router.push("/linkPayment");
+        router.refresh();
       }
     } catch (err) {
       console.error(err);

@@ -14,9 +14,6 @@ export default function LinkPaymentDetail() {
   const [copied, setCopied] = useState(false);
   const [token, setToken] = useState(null);
 
-
-  console.log('id:' + id);
-
   useEffect(() => {
     const savedToken = localStorage.getItem("jwtToken");
     if (savedToken) {
@@ -26,11 +23,9 @@ export default function LinkPaymentDetail() {
 
   // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
-    // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
-    return `/linkPayment/${id}/confirmPayment`;
+    return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
+    // return `/linkPayment/${id}/confirmPayment`;
   }, [id]);
-
-  console.log("payLink:" + payLink);
 
   // 결제 링크를 새로운 창에서 열기
   const openPaymentPage = () => {
@@ -38,9 +33,6 @@ export default function LinkPaymentDetail() {
   };
 
   useEffect(() => {
-
-    // const token = localStorage.getItem("jwtToken");
-
     if (!id || !token) {
       console.log("id나 token이 아직 준비 안 됐음");
       return;
@@ -53,17 +45,16 @@ export default function LinkPaymentDetail() {
 
     const fetchProductInfo = async () => {
       try {
+        const token = localStorage.getItem("jwtToken");
         const res = await fetch(`${API_BASE_URL}/api/product/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        console.log("res:" + res);
         if (!res.ok) throw new Error("상품 정보를 가져오지 못했습니다.");
 
         const data = await res.json();
-        console.log("data:" + data);
 
         setProduct(data);
       } catch (err) {
@@ -76,22 +67,32 @@ export default function LinkPaymentDetail() {
 
   const handleCopy = async () => {
     try {
-      if (navigator.clipboard) {
+      if (navigator.clipboard && window.isSecureContext) {
+        // 최신 브라우저, HTTPS 환경
         await navigator.clipboard.writeText(payLink);
       } else {
-        const input = document.createElement("input");
-        document.body.appendChild(input);
-        input.value = payLink;
-        input.select();
-        document.body.removeChild(input);
+        // fallback 방식
+        const textArea = document.createElement("textarea");
+        textArea.value = payLink;
+        textArea.style.position = "fixed";  // iOS에서도 스크롤 방지
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand("copy");
+        document.body.removeChild(textArea);
+        if (!successful) throw new Error("execCommand failed");
       }
+
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
       console.error("복사 실패:", err);
-      alert("복사에 실패했습니다.");
+      alert("복사에 실패했습니다. 브라우저 보안 설정을 확인해주세요.");
     }
   };
+
 
   if (error) return <p>{error}</p>;
   if (!product) return <p>로딩 중...</p>;
