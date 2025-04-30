@@ -44,9 +44,7 @@ export default function Signup() {
 
       const resData = await res.json();
       setMessage(resData.message || "회원가입이 완료되었습니다.");
-
-      // 자동 로그인 제거됨
-      // router.push("/login"); // 원할 경우 로그인 페이지로 이동
+      router.push("/login");
     } catch (err) {
       console.error("에러 발생:", err);
       setMessage("서버 오류로 회원가입에 실패했습니다.");

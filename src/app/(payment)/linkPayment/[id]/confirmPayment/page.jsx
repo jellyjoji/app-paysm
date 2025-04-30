@@ -1,203 +1,169 @@
-'use client';
-import styles from "./page.module.scss";
-import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
-import Modal from 'react-modal';
-import Image from "next/image";
 
-export default function ConfirmPaymentPage() {
-  const { id } = useParams();
-  const formRef = useRef(null);
-
-  const [product, setProduct] = useState(null);
-  const [paymentInfo, setPaymentInfo] = useState(null);
-  const [goodsQty, setGoodsQty] = useState(1);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [error, setError] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+export default function PaymentPage() {
+  const router = useRouter();
+  const params = useParams();
+  const productId = params?.id;
 
   useEffect(() => {
-    Modal.setAppElement('#root');
-  }, []);
+    console.log("경로에서 추출한 productId:", productId);
+  }, [productId]);
+
+  const [formValues, setFormValues] = useState({
+    payMethod: "card",
+    merchantId: "",
+    mid: "",
+    goodsNm: "",
+    ordNo: "",
+    unitPrice: "",
+    goodsQty: 1,
+    goodsAmt: "",
+    ediDate: "",
+    encData: "",
+    ordTel: "01000000000",
+    returnUrl: "/success",
+    trxCd: "0",
+    mbsUsrId: "고객명",
+    charSet: "UTF-8",
+  });
 
   useEffect(() => {
-    if (!id) return;
-
-    fetch(`${API_BASE_URL}/api/product/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("상품 정보 조회 실패");
-        return res.json();
-      })
-      .then((data) => {
-        setProduct(data);
-        setTotalAmount(data.unitPrice * goodsQty);
-      })
-      .catch((err) => setError(err.message));
-  }, [id]);
-
-  useEffect(() => {
-    if (!product || !totalAmount) return;
-
-    const fetchPaymentInfo = async () => {
-      try {
-        const payload = {
-          productId: id,
-          merchantId: product.merchantId,
-          mid: product.mid,
-          goodsAmt: totalAmount,
-          goodsNm: product.goodsNm,
-        };
-
-        const res = await fetch(`${API_BASE_URL}/api/payment/getPaymentinfo`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+    if (productId) {
+      fetch(`${API_BASE_URL}/api/product/${productId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFormValues((prev) => ({
+            ...prev,
+            merchantId: data.merchantId,
+            mid: data.mid,
+            goodsNm: data.goodsNm,
+            unitPrice: data.unitPrice,
+            goodsAmt: data.unitPrice,
+            ordNo: data.ordNo,
+          }));
         });
-
-        if (!res.ok) throw new Error('결제정보 요청 실패');
-        const data = await res.json();
-        setPaymentInfo(data);
-
-        // 최초 자동 결제 요청
-        await handlePayment(data);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-
-    fetchPaymentInfo();
-  }, [product, totalAmount]);
+    }
+  }, [productId]);
 
   useEffect(() => {
-    const handleMessage = async (event) => {
-      if (!event.data) return;
-
-      const receivedData = Array.isArray(event.data) ? event.data[1] : event.data;
-
-      if (receivedData?.encData) {
-        await handlePayment(receivedData);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
-
-  const handlePayment = async (data) => {
-    try {
-      const result = await paymentRequest(data);
-      if (result.resultCd === "0000") {
-        await registerPayment(data);
-      } else {
-        alert(`결제 실패: ${result.resultMsg}`);
-      }
-    } catch (err) {
-      alert(`결제 요청 중 오류: ${err.message}`);
+    const unit = parseInt(formValues.unitPrice);
+    const qty = parseInt(formValues.goodsQty);
+    if (!isNaN(unit) && !isNaN(qty)) {
+      setFormValues((prev) => ({
+        ...prev,
+        goodsAmt: (unit * qty).toString(),
+      }));
     }
+  }, [formValues.goodsQty, formValues.unitPrice]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const paymentRequest = async (data) => {
-    const formData = new URLSearchParams();
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-
-    const response = await fetch('https://api.skyclassism.com/payment.do', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formData.toString(),
+  const getPaymentInfo = async () => {
+    const res = await fetch(`${API_BASE_URL}/api/payment/getPaymentinfo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId,
+        merchantId: formValues.merchantId,
+        mid: formValues.mid,
+        goodsAmt: formValues.goodsAmt,
+        goodsNm: formValues.goodsNm,
+      }),
     });
 
-    if (!response.ok) throw new Error('결제 요청 실패');
-    return response.json();
+    if (!res.ok) throw new Error("결제정보 요청 실패");
+    const data = await res.json();
+    setFormValues((prev) => ({
+      ...prev,
+      ...data,
+    }));
+    return data;
   };
 
-  const registerPayment = async (data) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/payment/successInfoAdd`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await getPaymentInfo();
 
-      if (!response.ok) throw new Error("결제 등록 실패");
-      alert("결제 성공");
+    const form = document.createElement("form");
+    form.method = "post";
+    form.action = `/linkPayment/${productId}/confirmPayment/reConfirmPayment`;
+    // form.target = "_blank";
 
-      if (formRef.current) {
-        document.body.appendChild(formRef.current);
-        formRef.current.submit();
-      }
-    } catch (err) {
-      alert("결제 등록 중 오류 발생: " + err.message);
-    }
+    Object.entries(formValues).forEach(([key, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
   };
-
-  const formatPrice = (value) => value.toLocaleString('ko-KR') + '원';
-
-  if (error) return <div>오류: {error}</div>;
-  if (!product) return <div>상품 정보를 불러오는 중...</div>;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.container__title}>
-        <Image src="/confirmPayment.png" alt="결제 요청" width={100} height={100} />
-        <h3>결제 요청</h3>
-        <h1>{formatPrice(totalAmount)}</h1>
-      </div>
+    <div className="container text-center mt-5">
+      <form onSubmit={handleSubmit}>
+        <h3 className="mb-5">필수</h3>
+        {[
+          { label: "결제수단", name: "payMethod" },
+          { label: "merchantId", name: "merchantId" },
+          { label: "MID", name: "mid" },
+          { label: "상품명", name: "goodsNm" },
+          { label: "주문번호", name: "ordNo" },
+          { label: "상품 금액", name: "unitPrice" },
+          { label: "결제금액", name: "goodsAmt" },
+        ].map((field) => (
+          <div className="form-group" key={field.name}>
+            <label>{field.label}</label>
+            <input
+              type="text"
+              className="form-control"
+              name={field.name}
+              value={formValues[field.name]}
+              onChange={handleChange}
+            />
+          </div>
+        ))}
 
-      <div className={styles.container__content}>
-        <table>
-          <tbody>
-            <tr><th>상품명</th><td>{product.goodsNm}</td></tr>
-            <tr><th>단가</th><td>{formatPrice(product.unitPrice)}</td></tr>
-            <tr><th>수량</th><td>{goodsQty}</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      {paymentInfo && (
-        <form
-          ref={formRef}
-          method="post"
-          action="https://api.skyclassism.com/payInit_hash.do"
-          target="responseIframe"
-        >
-          <input type="hidden" name="merchantId" value={paymentInfo?.merchantId || ''} />
-          <input type="hidden" name="unitPrice" value={product.unitPrice} />
-          <input type="hidden" name="goodsAmt" value={totalAmount} />
-          <input type="hidden" name="encData" value={paymentInfo.encData} />
-          <input type="hidden" name="ediDate" value={paymentInfo.ediDate} />
-          <input type="hidden" name="mid" value={paymentInfo.mid} />
-          <input type="hidden" name="ordNo" value={paymentInfo.ordNo} />
-          <input type="hidden" name="goodsNm" value={product.goodsNm} />
-          <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl} />
-          <input type="hidden" name="payMethod" value="card" />
+        <div className="form-group">
+          <label>수량</label>
           <input
-            type="hidden"
-            name="userIp"
-            value={typeof window !== 'undefined' ? window.location.hostname : ''}
+            type="number"
+            className="form-control"
+            name="goodsQty"
+            min="1"
+            value={formValues.goodsQty}
+            onChange={handleChange}
           />
-          <button className='cta' type="submit" onClick={openModal}>
-            결제 요청 제출
-          </button>
-        </form>
-      )}
+        </div>
 
-      <Modal isOpen={isOpen} onRequestClose={closeModal} contentLabel="결제 프레임 모달">
-        <button onClick={closeModal}>모달 닫기</button>
-        <iframe
-          name="responseIframe"
-          title="결제 프레임"
-          width="100%"
-          height="100%"
-          style={{ border: 'none', zIndex: 9999, position: 'relative' }}
-          sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation"
-        />
-      </Modal>
+        <h3 className="mt-5">선택사항</h3>
+        {["ordTel", "returnUrl", "trxCd", "mbsUsrId", "charSet"].map((name) => (
+          <div className="form-group" key={name}>
+            <label>{name}</label>
+            <input
+              type="text"
+              className="form-control"
+              name={name}
+              value={formValues[name]}
+              onChange={handleChange}
+            />
+          </div>
+        ))}
+
+        <button type="submit" className="btn btn-secondary mt-3">
+          최종확인 페이지로 전달
+        </button>
+      </form>
     </div>
   );
 }

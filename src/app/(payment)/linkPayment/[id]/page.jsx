@@ -24,8 +24,8 @@ export default function LinkPaymentDetail() {
   // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
     // 결제 요청시 열리는 창 여기서 조정
-    return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
-    // return `/linkPayment/${id}/confirmPayment`;
+    // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
+    return `/linkPayment/${id}/confirmPayment`;
   }, [id]);
 
   // 결제 링크를 새로운 창에서 열기
@@ -34,7 +34,8 @@ export default function LinkPaymentDetail() {
   // };
 
   const openPaymentPage = () => {
-    const paymentWindow = window.open(payLink, '_blank', 'width=480,height=720');
+    // const paymentWindow = window.open(payLink, '_blank', 'width=480,height=720');
+    router.push(payLink);
 
     window.addEventListener('message', function (event) {
       const data = event.data;
@@ -198,7 +199,7 @@ export default function LinkPaymentDetail() {
 
           </div>
           <textarea type="text" id="payLink" value={payLink} readOnly />
-          <button className='cta' onClick={openPaymentPage}>결제 요쳥</button>
+          <button className='cta' onClick={openPaymentPage}>결제 요청</button>
 
         </div>
       </div>

@@ -37,7 +37,7 @@ export default function UserList() {
       setUsers(data);
     } catch (err) {
       console.error(err);
-      setError("사용자 목록을 불러오는 중 오류 발생");
+      setError("사용자 목록을 불러오는 중 오류 발생, 권한을 확인해주세요.");
     } finally {
       setLoading(false);
     }
