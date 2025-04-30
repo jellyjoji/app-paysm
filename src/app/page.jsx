@@ -33,7 +33,7 @@ export default function Home() {
           </div>
         </Link>
 
-        <Link href="/manualPayment" passHref>
+        {/* <Link href="/manualPayment" passHref>
           <div className={styles.container__content__item}>
             <Image src="/manual.png" alt="수기 결제"
               width={100}
@@ -42,7 +42,7 @@ export default function Home() {
               수기 결제
             </p>
           </div>
-        </Link>
+        </Link> */}
 
         <Link href="/qrPayment" passHref>
           <div className={styles.container__content__item}>

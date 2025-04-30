@@ -7,212 +7,64 @@ import Modal from 'react-modal';
 import Image from "next/image";
 
 export default function ConfirmPaymentPage() {
-  const params = useParams();
-  const [isOpen, setIsOpen] = useState(false);
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
+  const { id } = useParams();
+  const formRef = useRef(null);
 
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (!event.data) return;
-
-      try {
-        console.log("Received data from iframe:", event.data);
-
-        const data = event.data;
-        const receivedData = Array.isArray(data) ? data[1] : data;
-
-        // 필수 필드 확인 (예: encData 등)
-        if (receivedData?.encData) {
-          paymentRequest(receivedData)
-            .then((result) => {
-              if (result.resultCd === "0000") {
-                // 결제 성공 시 처리
-                paymentSuccess(formRef.current, receivedData);
-              } else {
-                alert("결제 실패: " + result.resultMsg);
-              }
-            })
-            .catch((err) => {
-              alert("결제 요청 중 오류 발생: " + err.message);
-            });
-        } else {
-          console.warn("수신된 데이터에 encData 없음", receivedData);
-        }
-
-      } catch (err) {
-        console.error("메시지 처리 중 오류:", err);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
-
-
-  useEffect(() => {
-    Modal.setAppElement('#root');
-  }, []);
-
-  const [productId, setProductId] = useState(null);
   const [product, setProduct] = useState(null);
   const [paymentInfo, setPaymentInfo] = useState(null);
   const [goodsQty, setGoodsQty] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState(null);
-  const formRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
 
   useEffect(() => {
-    if (params?.id) {
-      setProductId(String(params.id));
-    }
-  }, [params]);
+    Modal.setAppElement('#root');
+  }, []);
 
   useEffect(() => {
-    if (!productId) return;
-    fetch(`${API_BASE_URL}/api/product/${productId}`)
+    if (!id) return;
+
+    fetch(`${API_BASE_URL}/api/product/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("상품 정보 조회 실패");
         return res.json();
       })
       .then((data) => {
         setProduct(data);
-        setTotalAmount(data.unitPrice);
+        setTotalAmount(data.unitPrice * goodsQty);
       })
       .catch((err) => setError(err.message));
-  }, [productId]);
-
-  useEffect(() => {
-    if (product) {
-      const price = parseInt(product.unitPrice || 0, 10);
-      setTotalAmount(price * goodsQty);
-    }
-  }, [goodsQty, product]);
-
-  async function paymentRequest(receivedData) {
-    try {
-      // 서버에서 허용된 merchantId, mid, unitPrice를 써야 해요.
-      const paymentData = {
-        mid: receivedData?.mid || "defaultMid",
-        merchantId: receivedData?.merchantId || "testMerchant",
-        goodsNm: receivedData?.goodsNm || "Test Product",
-        unitPrice: receivedData?.unitPrice || "100",
-        returnUrl: receivedData?.returnUrl || "https://example.com/return",
-        notiUrl: receivedData?.notiUrl || "https://example.com/notify",
-        payMethod: receivedData?.payMethod || "CARD",
-      };
-
-      const formData = new URLSearchParams();
-      for (const key in receivedData) {
-        formData.append(key, receivedData[key]);
-      }
-
-      const response = await fetch('https://api.skyclassism.com/payment.do', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData.toString(),
-      });
-
-      if (!response.ok) {
-        throw new Error('결제 요청 실패');
-      }
-
-      const result = await response.json();
-      console.log('결제 요청 결과:', result);
-      if (result.resultCd !== "0000") {
-        throw new Error(`결제 실패: ${result.resultMsg}`);
-      }
-      return result;
-    } catch (error) {
-      console.error('paymentRequest 오류:', error);
-      throw error;
-    }
-  }
-
-  async function paymentSuccess(form, data) {
-    console.log('paymentSuccess 호출', data);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/payment/successInfoAdd`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        throw new Error("등록 실패");
-      }
-
-      const result = await response.json();
-      alert("결제 성공");
-
-      if (form) {
-        document.body.appendChild(form);
-        form.submit();
-      }
-    } catch (error) {
-      console.error("오류 발생:", error);
-      alert("결제 등록 중 오류 발생");
-    }
-  }
+  }, [id]);
 
   useEffect(() => {
     if (!product || !totalAmount) return;
 
     const fetchPaymentInfo = async () => {
       try {
+        const payload = {
+          productId: id,
+          merchantId: product.merchantId,
+          mid: product.mid,
+          goodsAmt: totalAmount,
+          goodsNm: product.goodsNm,
+        };
+
         const res = await fetch(`${API_BASE_URL}/api/payment/getPaymentinfo`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productId,
-            merchantId: product.merchantId || 'MID-074ee10a-cbc0-4011-b258-d572af22718c',
-            mid: product.mid || 'paysmtestm',
-            goodsAmt: totalAmount,
-            goodsNm: product.goodsNm,
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (!res.ok) throw new Error('결제정보 요청 실패');
         const data = await res.json();
-        console.log('응답 데이터:', data);
         setPaymentInfo(data);
 
-        try {
-          const paymentResult = await paymentRequest(data);
-          if (paymentResult.resultCd === "0000") {
-            if (!data.merchantId && data.mid) {
-              data.merchantId = data.mid;
-            }
-            if (!data.unitPrice && data.goodsAmt) {
-              data.unitPrice = data.goodsAmt;
-            }
-
-            if (!data.merchantId || !data.goodsAmt || !data.goodsNm || !data.encData) {
-              throw new Error('결제 필수 데이터 누락');
-            }
-
-            await paymentSuccess(formRef.current, data);
-          } else {
-            throw new Error(`결제 실패: ${paymentResult.resultMsg}`);
-          }
-        } catch (error) {
-          console.error('결제 실패 처리:', error);
-          alert('결제 실패: ' + error.message);
-        }
-
-        if (data.status === "success") {
-          window.location.href = "/success";
-        } else {
-          console.log("결제 실패");
-        }
+        // 최초 자동 결제 요청
+        await handlePayment(data);
       } catch (err) {
-        console.error('응답 처리 중 오류 발생:', err);
         setError(err.message);
       }
     };
@@ -220,9 +72,71 @@ export default function ConfirmPaymentPage() {
     fetchPaymentInfo();
   }, [product, totalAmount]);
 
-  const formatPrice = (value) => {
-    return value.toLocaleString('ko-KR') + '원';
+  useEffect(() => {
+    const handleMessage = async (event) => {
+      if (!event.data) return;
+
+      const receivedData = Array.isArray(event.data) ? event.data[1] : event.data;
+
+      if (receivedData?.encData) {
+        await handlePayment(receivedData);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  const handlePayment = async (data) => {
+    try {
+      const result = await paymentRequest(data);
+      if (result.resultCd === "0000") {
+        await registerPayment(data);
+      } else {
+        alert(`결제 실패: ${result.resultMsg}`);
+      }
+    } catch (err) {
+      alert(`결제 요청 중 오류: ${err.message}`);
+    }
   };
+
+  const paymentRequest = async (data) => {
+    const formData = new URLSearchParams();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+
+    const response = await fetch('https://api.skyclassism.com/payment.do', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+    });
+
+    if (!response.ok) throw new Error('결제 요청 실패');
+    return response.json();
+  };
+
+  const registerPayment = async (data) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payment/successInfoAdd`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("결제 등록 실패");
+      alert("결제 성공");
+
+      if (formRef.current) {
+        document.body.appendChild(formRef.current);
+        formRef.current.submit();
+      }
+    } catch (err) {
+      alert("결제 등록 중 오류 발생: " + err.message);
+    }
+  };
+
+  const formatPrice = (value) => value.toLocaleString('ko-KR') + '원';
 
   if (error) return <div>오류: {error}</div>;
   if (!product) return <div>상품 정보를 불러오는 중...</div>;
@@ -243,14 +157,6 @@ export default function ConfirmPaymentPage() {
             <tr><th>수량</th><td>{goodsQty}</td></tr>
           </tbody>
         </table>
-
-        <div>
-          <input type="hidden" name="productId" value={productId} />
-          <input type="hidden" name="merchantId" value={product.merchantId} />
-          <input type="hidden" name="mid" value={product.mid} />
-          <input type="hidden" name="goodsNm" value={product.goodsNm} />
-          <input type="hidden" name="goodsAmt" value={totalAmount} />
-        </div>
       </div>
 
       {paymentInfo && (
@@ -260,50 +166,38 @@ export default function ConfirmPaymentPage() {
           action="https://api.skyclassism.com/payInit_hash.do"
           target="responseIframe"
         >
-          <input type="hidden" name="merchantId" value={paymentInfo.merchantId || 'MID-074ee10a-cbc0-4011-b258-d572af22718c'} />
-          <input type="hidden" name="unitPrice" value={product.unitPrice || totalAmount} />
+          <input type="hidden" name="merchantId" value={paymentInfo?.merchantId || ''} />
+          <input type="hidden" name="unitPrice" value={product.unitPrice} />
           <input type="hidden" name="goodsAmt" value={totalAmount} />
           <input type="hidden" name="encData" value={paymentInfo.encData} />
           <input type="hidden" name="ediDate" value={paymentInfo.ediDate} />
           <input type="hidden" name="mid" value={paymentInfo.mid} />
           <input type="hidden" name="ordNo" value={paymentInfo.ordNo} />
           <input type="hidden" name="goodsNm" value={product.goodsNm} />
-          <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl || `${API_BASE_URL}/success`} />
+          <input type="hidden" name="returnUrl" value={paymentInfo.returnUrl} />
           <input type="hidden" name="payMethod" value="card" />
-          <input type="hidden" name="ordNm" value="" placeholder="구매자명" />
-          <input type="hidden" name="ordTel" value="01000000000" placeholder="구매자연락처" />
-          <input type="hidden" name="ordEmail" value="" placeholder="구매자이메일" />
-          <input type="hidden" name="userIp" value={typeof window !== 'undefined' ? window.location.hostname : ''} />
-          <input type="hidden" name="mbsUsrId" value="고객명" />
-          <input type="hidden" name="trxCd" value="0" />
-          <input type="hidden" name="charSet" value="UTF-8" />
-          <input type="hidden" name="mbsReserved" value="reservedField" />
-
+          <input
+            type="hidden"
+            name="userIp"
+            value={typeof window !== 'undefined' ? window.location.hostname : ''}
+          />
           <button className='cta' type="submit" onClick={openModal}>
             결제 요청 제출
           </button>
         </form>
       )}
 
-      <div>
-        <Modal
-          isOpen={isOpen}
-          onRequestClose={closeModal}
-          contentLabel="모달 내용"
-        >
-          <button onClick={closeModal}>모달 닫기</button>
-          <div>
-            <iframe
-              name="responseIframe"
-              title="결제 프레임"
-              width="100%"
-              height="100vh"
-              style={{ height: '100vh', border: 'none', zIndex: 9999, position: 'relative' }}
-              sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation"
-            ></iframe>
-          </div>
-        </Modal>
-      </div>
+      <Modal isOpen={isOpen} onRequestClose={closeModal} contentLabel="결제 프레임 모달">
+        <button onClick={closeModal}>모달 닫기</button>
+        <iframe
+          name="responseIframe"
+          title="결제 프레임"
+          width="100%"
+          height="100%"
+          style={{ border: 'none', zIndex: 9999, position: 'relative' }}
+          sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-top-navigation"
+        />
+      </Modal>
     </div>
   );
 }

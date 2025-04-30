@@ -23,14 +23,73 @@ export default function LinkPaymentDetail() {
 
   // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
+    // 결제 요청시 열리는 창 여기서 조정
     return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
     // return `/linkPayment/${id}/confirmPayment`;
   }, [id]);
 
   // 결제 링크를 새로운 창에서 열기
+  // const openPaymentPage = () => {
+  //   router.push(payLink);
+  // };
+
   const openPaymentPage = () => {
-    router.push(payLink);
+    const paymentWindow = window.open(payLink, '_blank', 'width=480,height=720');
+
+    window.addEventListener('message', function (event) {
+      const data = event.data;
+      console.log("Received data:", data);
+
+      const receiveData = Array.isArray(data) ? data[1] : data;
+
+      if (receiveData?.encData) {
+        console.log("encData 수신 확인:", receiveData.encData);
+        paymentRequest(receiveData);
+      }
+    }, { once: true }); // 한 번만 수신
   };
+
+  const paymentRequest = async (data) => {
+    try {
+      const formData = new URLSearchParams();
+      for (const key in data) {
+        formData.append(key, data[key]);
+      }
+
+      const response = await fetch('https://api.skyclassism.com/payment.do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+      });
+
+      const result = await response.json();
+      console.log("결제 응답:", result);
+
+      if (result.resultCd === "0000") {
+        await registerPayment(data);
+        alert("결제 성공");
+      } else {
+        alert(`결제 실패: ${result.resultMsg}`);
+      }
+    } catch (err) {
+      console.error("결제 요청 중 오류:", err);
+    }
+  };
+
+  const registerPayment = async (data) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/payment/successInfoAdd`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("결제 등록 실패");
+    } catch (err) {
+      console.error("등록 실패:", err);
+    }
+  };
+
 
   useEffect(() => {
     if (!id || !token) {
@@ -43,7 +102,7 @@ export default function LinkPaymentDetail() {
       return;
     }
 
-    const fetchProductInfo = async () => {
+    const fetchProduct = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const res = await fetch(`${API_BASE_URL}/api/product/${id}`, {
@@ -61,7 +120,7 @@ export default function LinkPaymentDetail() {
         setError(err.message);
       }
     };
-    fetchProductInfo();
+    fetchProduct();
   }, [id, token]);
 
 
@@ -129,6 +188,7 @@ export default function LinkPaymentDetail() {
           <div className={styles.container__form__content__copy}>
             <label htmlFor="payLink">결제 링크</label>
             <button onClick={handleCopy}>
+
               {/* 툴팁 처리 */}
               {copied && (
                 <p>복사됨!</p>

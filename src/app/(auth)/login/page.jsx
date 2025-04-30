@@ -5,6 +5,7 @@ import { login } from '../../../lib/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Eye, EyeClosed } from 'lucide-react';
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -96,6 +97,12 @@ export default function Login() {
         <button className='cta' onClick={handleLogin}>로그인</button>
         <p >{msg}</p>
       </form>
+
+      <Link href="/signup">
+        <div>
+          계정이 없으신가요? <strong>회원가입</strong>
+        </div>
+      </Link>
     </div>
   );
 }

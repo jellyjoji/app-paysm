@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { API_BASE_URL } from "@/lib/api";
 import { Eye, EyeClosed } from 'lucide-react';
+import Link from "next/link";
 
 export default function Signup() {
   const router = useRouter();
@@ -102,6 +103,13 @@ export default function Signup() {
           </p>
         )}
       </form>
+
+      <Link href="/login">
+        <div>
+          이미 계정이 있나요? <strong>로그인</strong>
+        </div>
+      </Link>
+
     </div>
   );
 }
