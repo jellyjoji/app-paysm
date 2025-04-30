@@ -36,7 +36,7 @@ export default function QrPaymentDetail() {
       return;
     }
 
-    const fetchProductInfo = async () => {
+    const fetchProduct = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const res = await fetch(`${API_BASE_URL}/api/product/${id}`, {
@@ -63,7 +63,7 @@ export default function QrPaymentDetail() {
       }
     };
 
-    fetchProductInfo();
+    fetchProduct();
   }, [id, token, payLink]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
 
   if (error) return <p>{error}</p>;

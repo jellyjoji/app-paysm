@@ -123,6 +123,7 @@ export default function Header() {
             alt="페이즘"
             width={71}
             height={32}
+            style={{ marginLeft: '1rem' }}
           ></Image>
           <button onClick={goMenu}>
             <Menu />

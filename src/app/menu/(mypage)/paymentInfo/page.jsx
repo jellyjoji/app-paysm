@@ -123,7 +123,7 @@ export default function PaymentInfo() {
 
     <div className={styles.container__content}>
       <label htmlFor="merchantKey">상점 Key</label>
-      <input
+      <textarea
         id="merchantKey"
         type="text"
         value={merchantKey}

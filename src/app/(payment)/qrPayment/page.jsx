@@ -14,7 +14,7 @@ export default function QrPayment() {
     const token = localStorage.getItem("jwtToken");
 
     if (token) {
-      fetch(`${API_BASE_URL}/api/product/linkProductFindAllByUserId`, {
+      fetch(`${API_BASE_URL}/api/product/qrProductFindAllByUserId`, {
         method: 'GET',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -22,12 +22,17 @@ export default function QrPayment() {
       })
         .then((response) => {
           if (!response.ok) {
+            if (response.status === 403) {
+              throw new Error("접근 권한이 없습니다. 로그인 상태를 확인해주세요.");
+            }
             throw new Error("상품 목록을 불러오는 데 실패했습니다.");
           }
           return response.json();
         })
         .then((data) => {
           setProducts(data);
+          console.log('data' + data);
+
         })
         .catch((err) => {
           setError(err.message);
