@@ -23,9 +23,11 @@ export default function LinkPaymentDetail() {
 
   // 내보내는 새창 주소 생성
   const payLink = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
     // 결제 요청시 열리는 창 여기서 조정
     // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
-    return `/linkPayment/${id}/confirmPayment`;
+    return `${origin}/linkPayment/${id}/confirmPayment`;
   }, [id]);
 
   // 결제 링크를 새로운 창에서 열기
