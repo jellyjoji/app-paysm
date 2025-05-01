@@ -2,16 +2,18 @@
 
 import styles from "./page.module.scss";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
 import QRCode from 'qrcode';  // qrcode 라이브러리 추가
 
 export default function QrPaymentDetail() {
   const { id } = useParams();
+  const router = useRouter();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
   const [qrcode, setQrcode] = useState(null);  // QR 코드 상태 추가
   const [token, setToken] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("jwtToken");
@@ -66,6 +68,38 @@ export default function QrPaymentDetail() {
     fetchProduct();
   }, [id, token, payLink]);  // payLink 추가하여 payLink이 변경될 때마다 QR 코드도 갱신되도록 설정
 
+  const handleDelete = async () => {
+    if (!id) {
+      alert('상품 ID가 없습니다.');
+      return;
+    }
+
+    const confirmDelete = confirm('정말로 이 상품을 삭제하시겠습니까?');
+    if (!confirmDelete) return;
+
+    try {
+      setIsDeleting(true);
+
+      const res = await fetch(`${API_BASE_URL}/api/product/delete/${id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) throw new Error('삭제 실패');
+
+      alert('상품이 삭제되었습니다.');
+      router.push('/qrPayment'); // QR 결제 목록 페이지로 이동
+    } catch (err) {
+      console.error('삭제 오류:', err);
+      alert('상품 삭제 중 오류 발생');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (error) return <p>{error}</p>;
   if (!product) return <p>로딩 중...</p>;
 
@@ -111,10 +145,17 @@ export default function QrPaymentDetail() {
               <p>QR 코드 생성 중...</p>
             )}
           </div>
+
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className='cta delete'
+          >
+            {isDeleting ? '삭제 중...' : '삭제'}
+          </button>
+
         </div>
-
       </div>
-
     </div>
   );
 }

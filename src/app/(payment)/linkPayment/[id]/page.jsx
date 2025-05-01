@@ -13,6 +13,8 @@ export default function LinkPaymentDetail() {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [token, setToken] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   useEffect(() => {
     const savedToken = localStorage.getItem("jwtToken");
@@ -30,13 +32,7 @@ export default function LinkPaymentDetail() {
     return `${origin}/linkPayment/${id}/confirmPayment`;
   }, [id]);
 
-  // 결제 링크를 새로운 창에서 열기
-  // const openPaymentPage = () => {
-  //   router.push(payLink);
-  // };
-
   const openPaymentPage = () => {
-    // const paymentWindow = window.open(payLink, '_blank', 'width=480,height=720');
     router.push(payLink);
 
     window.addEventListener('message', function (event) {
@@ -155,6 +151,30 @@ export default function LinkPaymentDetail() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
+
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`${API_BASE_URL}/api/product/delete/${id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) throw new Error('삭제 실패');
+
+      alert('상품이 삭제되었습니다.');
+      router.push('/linkPayment'); // 목록 페이지로 이동
+    } catch (err) {
+      console.error('삭제 오류:', err);
+      alert('상품 삭제 중 오류 발생');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (error) return <p>{error}</p>;
   if (!product) return <p>로딩 중...</p>;
@@ -201,7 +221,17 @@ export default function LinkPaymentDetail() {
 
           </div>
           <textarea type="text" id="payLink" value={payLink} readOnly />
-          <button className='cta' onClick={openPaymentPage}>결제 요청</button>
+
+          {/* 결제 요청 버튼 비활성화 */}
+          {/* <button className='cta' onClick={openPaymentPage}>결제 요청</button> */}
+
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className='cta delete'
+          >
+            {isDeleting ? '삭제 중...' : '삭제'}
+          </button>
 
         </div>
       </div>

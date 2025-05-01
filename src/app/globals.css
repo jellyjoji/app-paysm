@@ -192,3 +192,13 @@ textarea {
   border-radius: var(--radius-medium);
   text-align: center;
 }
+
+.delete {
+  color: var(--red700);
+  background-color: var(--red100);
+  transition: var(--transition);
+}
+.delete:hover {
+  color: var(--red100);
+  background-color: var(--red700);
+}
