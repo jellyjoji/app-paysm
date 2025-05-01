@@ -15,6 +15,7 @@
   --indigo50: #eef2ff;
   --red100: #fee2e2;
   --red300: #fca5a5;
+  --red500: #ff3b30;
   --red700: #b91c1c;
   --blue100: #dbeafe;
   --blue300: #93c5fd;
@@ -173,11 +174,11 @@ li {
   color: var(--green700);
 }
 .statusPending {
-  color: var(--red700);
+  color: var(--red500);
 }
 .statusCanceled {
   color: var(--gray5);
-  /* text-decoration: line-through; */
+  text-decoration: line-through;
 }
 input,
 textarea {
