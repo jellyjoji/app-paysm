@@ -162,23 +162,26 @@ export default function PaymentDetail() {
             />
           </div>
 
-          {/* 결제 완료 상태 : 영수증 조회하기 버튼 */}
-          {/* 결제 미완료 상태 : 결제 취소하기 버튼 */}
-
-          <button
-            type="button"
-            className="btn btn-danger me-2"
-            onClick={cancelPayment}
-          >
-            결제취소
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => router.push(`/menu/paymentHistory/${paymentInfo.tid}/receipt`)}
-          >
-            영수증보기
-          </button>
+          {/* 결제 미완료 상태일 때만 결제 취소 버튼 표시 */}
+          {paymentInfo.resultMsg !== '정상처리' && (
+            <button
+              type="button"
+              className="cta delete"
+              onClick={cancelPayment}
+            >
+              결제 취소
+            </button>
+          )}
+          {/* 결제 완료 상태일 때만 영수증 보기 버튼 표시 */}
+          {paymentInfo.resultMsg === '정상처리' && (
+            <button
+              type="button"
+              className="cta"
+              onClick={() => router.push(`/menu/paymentHistory/${paymentInfo.tid}/receipt`)}
+            >
+              영수증보기
+            </button>
+          )}
 
         </>
       ) : (
