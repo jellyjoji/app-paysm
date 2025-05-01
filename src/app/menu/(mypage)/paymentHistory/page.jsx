@@ -10,14 +10,22 @@ import { API_BASE_URL } from "@/lib/api";
 
 export default function PaymentHistory() {
   const [startDate, setStartDate] = useState(() => {
+    const savedStartDate = localStorage.getItem('paymentHistoryStartDate');
+    if (savedStartDate) {
+      return new Date(savedStartDate);
+    }
     const date = new Date();
-    date.setHours(0, 0, 0, 0); // 오늘 자정(00:00:00)
+    date.setHours(0, 0, 0, 0);
     return date;
   });
 
   const [endDate, setEndDate] = useState(() => {
+    const savedEndDate = localStorage.getItem('paymentHistoryEndDate');
+    if (savedEndDate) {
+      return new Date(savedEndDate);
+    }
     const date = new Date();
-    date.setHours(23, 59, 59, 999); // 오늘 끝(23:59:59.999)
+    date.setHours(23, 59, 59, 999);
     return date;
   });
 
@@ -107,8 +115,10 @@ export default function PaymentHistory() {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
+              localStorage.setItem('paymentHistoryStartDate', date.toISOString());
               if (endDate && date > endDate) {
-                setEndDate(date); // 자동 조정
+                setEndDate(date);
+                localStorage.setItem('paymentHistoryEndDate', date.toISOString());
               }
             }}
             selectsStart
@@ -123,7 +133,10 @@ export default function PaymentHistory() {
           <label>종료 날짜: </label>
           <DatePicker
             selected={endDate}
-            onChange={(date) => setEndDate(date)}
+            onChange={(date) => {
+              setEndDate(date);
+              localStorage.setItem('paymentHistoryEndDate', date.toISOString());
+            }}
             selectsEnd
             startDate={startDate}
             endDate={endDate}
