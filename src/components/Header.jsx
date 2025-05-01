@@ -20,23 +20,43 @@ export default function Header() {
       return;
     }
     if (path.startsWith('/menu/paymenthistory/')) {
-      setTitle('결제 내역 상세');
+      setTitle('결제 내역 상세보기');
       return;
     }
 
-    // if (path.startsWith('/linkPayment/') && path.endsWith('/confirmPayment')) {
-    //   setTitle('결제 요청하기');
-    //   return;
-    // }
-    // if (path.startsWith('/linkPayment/')) {
-    //   setTitle('링크 결제 상세보기');
-    //   return;
-    // }
+    // 링크 결제 관련 경로
+    if (path.startsWith('/linkpayment/') && path.endsWith('/reconfirmpayment')) {
+      setTitle('최종 결제 요청');
+      return;
+    }
+    if (path.startsWith('/linkpayment/') && path.endsWith('/confirmpayment')) {
+      setTitle('결제 요청하기');
+      return;
+    }
+    if (path.startsWith('/linkpayment/') && path.endsWith('/addlinkpayment')) {
+      setTitle('링크 결제 추가하기');
+      return;
+    }
+    if (path.startsWith('/linkpayment/')) {
+      setTitle('링크 결제 상세보기');
+      return;
+    }
 
-    // if (path.startsWith('/menu/userInfo/')) {
-    //   setTitle('회원정보 상세');
-    //   return;
-    // }
+    // 회원 정보 관련 경로
+    if (path.startsWith('/menu/userinfo/')) {
+      setTitle('회원정보 상세보기');
+      return;
+    }
+
+    // QR 결제 관련 경로
+    if (path.startsWith('/qrpayment/') && path.endsWith('/addqrpayment')) {
+      setTitle('QR 결제 추가하기');
+      return;
+    }
+    if (path.startsWith('/qrpayment/')) {
+      setTitle('QR 결제 상세보기');
+      return;
+    }
 
     switch (pathname) {
       case '/':
