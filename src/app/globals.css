@@ -185,7 +185,10 @@ textarea {
   padding-left: 1rem;
   border-radius: var(--radius-small);
 }
-
+select {
+  padding: 0.8rem;
+  border-radius: var(--radius-small);
+}
 .cta {
   color: var(--white);
   background-color: var(--color-primary);
