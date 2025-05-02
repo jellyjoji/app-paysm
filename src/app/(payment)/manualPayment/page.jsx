@@ -284,7 +284,7 @@ export default function ManualPayment() {
         </div>
 
         <button type="submit" className='cta'>
-          결제하기
+          결제 요청하기
         </button>
       </form>
     </div>
