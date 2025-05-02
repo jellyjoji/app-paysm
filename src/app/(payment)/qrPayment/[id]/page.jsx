@@ -23,9 +23,12 @@ export default function QrPaymentDetail() {
   }, []);
 
   const payLink = useMemo(() => {
-    return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
-    // return `/linkPayment/${id}/confirmPayment`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    // return `${API_BASE_URL}/payment/paymentLink?productId=${id}`;
+    return `${origin}/qrPayment/${id}/confirmPayment`;
   }, [id]);
+
+  console.log("생성할 QR 링크:", payLink);
 
   useEffect(() => {
     if (!id || !token) {
@@ -62,6 +65,7 @@ export default function QrPaymentDetail() {
         });
       } catch (err) {
         setError(err.message);
+        console.log('생성된 QR 코드 URL:', url); // <- 브라우저에서 확인
       }
     };
 
@@ -131,10 +135,10 @@ export default function QrPaymentDetail() {
           <input type="text" id="mid" value={product.mid} readOnly />
         </div>
 
-        {/* <div className={styles.container__form__content}>
+        <div className={styles.container__form__content}>
           <label htmlFor="payLink">결제 링크</label>
           <textarea type="text" id="payLink" value={payLink} readOnly />
-        </div> */}
+        </div>
 
         <div className={styles.container__form__content}>
           <label htmlFor="qrcode">QR 코드</label>

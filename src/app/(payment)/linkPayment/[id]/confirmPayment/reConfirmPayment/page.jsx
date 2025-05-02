@@ -5,7 +5,7 @@ import Head from 'next/head';
 import { API_BASE_URL } from "@/lib/api";
 import { useParams } from "next/navigation";
 
-export default function PaymentPage() {
+export default function ReConfirmPayment() {
   const params = useParams();
   const productId = params?.id;
   useEffect(() => {

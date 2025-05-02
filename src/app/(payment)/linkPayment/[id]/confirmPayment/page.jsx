@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
 
-export default function PaymentPage() {
+export default function ConfirmPayment() {
   const router = useRouter();
   const params = useParams();
   const productId = params?.id;
@@ -115,30 +115,24 @@ export default function PaymentPage() {
 
   return (
     <div className={styles.container}>
-      <form onSubmit={handleSubmit}>
-        <h3>결제 정보</h3>
-
-        <div className={styles.formGroup}>
-          <label>상품명</label>
-          <input
-            type="text"
-            name="goodsNm"
-            value={formValues.goodsNm}
-            onChange={handleChange}
-            readOnly
-          />
+      <form className={styles.container__content} onSubmit={handleSubmit}>
+        <div>
+          <div>상품 금액</div>
+          <div>{Number(formValues.unitPrice).toLocaleString()}원</div>
         </div>
+        <table className={styles.paymentTable}>
+          <tbody>
+            <tr>
+              <th>상품명</th>
+              <td>{formValues.goodsNm}</td>
+            </tr>
+            <tr>
+              <th>결제금액</th>
+              <td>{Number(formValues.goodsAmt).toLocaleString()}원</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div className={styles.formGroup}>
-          <label>상품 금액</label>
-          <input
-            type="text"
-            name="unitPrice"
-            value={Number(formValues.unitPrice).toLocaleString()}
-            onChange={handleChange}
-            readOnly
-          />
-        </div>
 
         <div className={styles.formGroup}>
           <label>수량</label>
@@ -148,17 +142,6 @@ export default function PaymentPage() {
             min="1"
             value={formValues.goodsQty}
             onChange={handleChange}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label>결제금액</label>
-          <input
-            type="text"
-            name="goodsAmt"
-            value={Number(formValues.goodsAmt).toLocaleString()}
-            onChange={handleChange}
-            readOnly
           />
         </div>
 
