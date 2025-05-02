@@ -16,18 +16,59 @@ export default function Signup() {
     userName: '',
     userPhone: '',
     businessNumber: '',
+    email: '',
   });
 
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [userIdError, setUserIdError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateUserId = (userId) => {
+    const userIdRegex = /^[a-z][a-z0-9]*$/;
+    if (!userIdRegex.test(userId)) {
+      setUserIdError('아이디는 영문 소문자 혹은 영문 소문자와 숫자만 사용할 수 있습니다.');
+      return false;
+    }
+    setUserIdError('');
+    return true;
+  };
+
+  const validatePassword = (password) => {
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*]/.test(password);
+
+    if (!hasLetter || !hasNumber || !hasSpecial) {
+      setPasswordError('비밀번호는 영문자, 숫자, 특수문자(!@#$%^&*)를 모두 포함해야 합니다.');
+      return false;
+    }
+
+    setPasswordError('');
+    return true;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'userId') {
+      validateUserId(value);
+    }
+    if (name === 'userPass') {
+      validatePassword(value);
+    }
     setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateUserId(form.userId)) {
+      return;
+    }
+
+    if (!validatePassword(form.userPass)) {
+      return;
+    }
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/user/signUp`, {
@@ -60,10 +101,22 @@ export default function Signup() {
         <div className={styles.container__form__content}>
           <label htmlFor="userId">아이디</label>
           <input type="text" name="userId" id="userId" value={form.userId} onChange={handleChange} placeholder="ab12" />
+          {userIdError && <p className='error'>{userIdError}</p>}
         </div>
         <div className={styles.container__form__content}>
           <label htmlFor="userName">이름</label>
           <input type="text" name="userName" id="userName" value={form.userName} onChange={handleChange} placeholder="홍길동" />
+        </div>
+        <div className={styles.container__form__content}>
+          <label htmlFor="email">이메일</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="example@email.com"
+          />
         </div>
         <div className={styles.container__form__content}>
           <label htmlFor="userPhone">전화번호</label>
@@ -92,7 +145,7 @@ export default function Signup() {
           >
             {showPassword ? <EyeClosed /> : <Eye />}
           </button>
-
+          {passwordError && <p className='error'>{passwordError}</p>}
         </div>
         <button className='cta' type="submit">회원가입</button>
         {message && (

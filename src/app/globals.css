@@ -206,3 +206,6 @@ select {
   color: var(--red100);
   background-color: var(--red700);
 }
+.error {
+  color: var(--red500);
+}
