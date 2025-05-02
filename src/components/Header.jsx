@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { House, ChevronLeft, Menu } from 'lucide-react';
 import styles from './test.module.scss';
@@ -140,6 +141,16 @@ export default function Header() {
 
   return (
     <>
+      <Head>
+        <title>{title ? `${title} | 페이즘` : '페이즘'}</title>
+        <meta name="description" content="간편한 결제 서비스 페이즘" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta property="og:title" content={title ? `${title} | 페이즘` : '페이즘'} />
+        <meta property="og:description" content="간편한 결제 서비스 페이즘" />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:type" content="website" />
+      </Head>
       <header className={styles.header}>
         {isHome ? (<>
           <Image
