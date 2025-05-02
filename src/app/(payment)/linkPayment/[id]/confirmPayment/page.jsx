@@ -4,6 +4,7 @@ import styles from "./page.module.scss";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
+import Image from 'next/image';
 
 export default function ConfirmPayment() {
   const router = useRouter();
@@ -115,40 +116,46 @@ export default function ConfirmPayment() {
 
   return (
     <div className={styles.container}>
-      <form className={styles.container__content} onSubmit={handleSubmit}>
-        <div>
-          <div>상품 금액</div>
-          <div>{Number(formValues.unitPrice).toLocaleString()}원</div>
-        </div>
-        <table className={styles.paymentTable}>
-          <tbody>
-            <tr>
-              <th>상품명</th>
-              <td>{formValues.goodsNm}</td>
-            </tr>
-            <tr>
-              <th>결제금액</th>
-              <td>{Number(formValues.goodsAmt).toLocaleString()}원</td>
-            </tr>
-          </tbody>
-        </table>
+      <Image src="/confirmPayment.png" alt="페이즘"
+        width={130}
+        height={130} />
 
+      <form className={styles.container__form} onSubmit={handleSubmit}>
+        <div className={styles.container__form__title}>
 
-        <div className={styles.formGroup}>
-          <label>수량</label>
-          <input
-            type="number"
-            name="goodsQty"
-            min="1"
-            value={formValues.goodsQty}
-            onChange={handleChange}
-          />
+          <div>결제금액</div>
+          <h1>{Number(formValues.goodsAmt).toLocaleString()}원</h1>
         </div>
 
+        <div className={styles.container__form__content}>
+          <table className={styles.container__form__content__table}>
+            <tbody>
+              <tr>
+                <th>상품명</th>
+                <td>{formValues.goodsNm}</td>
+              </tr>
+              <tr>
+                <th>상품 금액</th>
+                <td>{Number(formValues.unitPrice).toLocaleString()}원</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.container__form__content__quantity}>
+            <label>수량</label>
+            <input
+              type="number"
+              name="goodsQty"
+              min="1"
+              value={formValues.goodsQty}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
         <button type="submit" className="cta">
           결제하기
         </button>
-      </form>
-    </div>
+      </form >
+    </div >
   );
 }
