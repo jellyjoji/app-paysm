@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <h1>쉽고 빠른 PG 연동 <br />페이즘</h1>
-      <h2>다양한 결제 수단으로 <br />편리하고 안전한 결제를 지원해 드려요.</h2>
+      <h2>다양한 결제 수단으로 <br />편리하고 안전한 결제를 <br />지원해 드려요.</h2>
       <div className={styles.container__content}>
         <Link href="/linkPayment" passHref>
           <div className={styles.container__content__item}>
@@ -61,12 +61,12 @@ export default function Home() {
               width={100}
               height={100} />
             <p>
-              PAYsm 바로가기
+              PG 신청하기
             </p>
           </div>
         </Link>
 
-      </div>
+      </div >
     </div >
   );
 }
