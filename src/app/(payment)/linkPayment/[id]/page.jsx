@@ -230,7 +230,7 @@ export default function LinkPaymentDetail() {
             disabled={isDeleting}
             className='cta delete'
           >
-            {isDeleting ? '삭제 중...' : '삭제'}
+            {isDeleting ? '삭제 중...' : '삭제하기'}
           </button>
 
         </div>

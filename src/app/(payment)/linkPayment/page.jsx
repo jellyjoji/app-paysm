@@ -8,10 +8,10 @@ import Link from "next/link";
 export default function LinkPayment() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // ✅ 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-
-  useEffect(() => {
+  const fetchProducts = () => {
     const token = localStorage.getItem("jwtToken");
 
     if (token) {
@@ -37,16 +37,49 @@ export default function LinkPayment() {
           setError(err.message);
         })
         .finally(() => {
-          setIsLoading(false); // ✅ 로딩 종료
+          setIsLoading(false);
         });
     } else {
       setError("로그인 토큰이 없습니다.");
-      setIsLoading(false); // ✅ 토큰이 없을 때도 로딩 종료
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
 
+  const handleDelete = async (productId, e) => {
+    e.preventDefault(); // 링크 클릭 이벤트 중지
+    e.stopPropagation(); // 이벤트 버블링 중지
+
+    if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
+
+    try {
+      setIsDeleting(true);
+      const token = localStorage.getItem("jwtToken");
+      const res = await fetch(`${API_BASE_URL}/api/product/delete/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) throw new Error('삭제 실패');
+
+      alert('상품이 삭제되었습니다.');
+      fetchProducts(); // 목록 새로고침
+    } catch (err) {
+      console.error('삭제 오류:', err);
+      alert('상품 삭제 중 오류 발생');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className={styles.container} >
+    <div className={styles.container}>
       <ul className={styles.container__form}>
         <Link href="/linkPayment/addLinkPayment">
           <li className={styles.container__form__content}>
@@ -60,21 +93,18 @@ export default function LinkPayment() {
           </li>
         </Link>
 
-        {/* ✅ 로딩 중일 때 표시 */}
         {isLoading && (
           <li className={styles.container__form__content}>
             <p>로딩 중...</p>
           </li>
         )}
 
-        {/* ✅ 에러 메시지 표시 */}
         {!isLoading && error && (
           <li className={styles.container__form__content}>
             <p style={{ color: "red" }}>{error}</p>
           </li>
         )}
 
-        {/* ✅ 상품 목록 출력 */}
         {!isLoading && !error && products.length > 0 && (
           products.map((product) => (
             <li key={product.productId} className={styles.container__form__content}>
@@ -82,16 +112,30 @@ export default function LinkPayment() {
                 <div className={styles.container__form__content__info}>
                   <div className={styles.container__form__content__info__title}>
                     <h3>{product.goodsNm}</h3>
-                    <p>{product.unitPrice} 원</p>
+                    <p>{product.unitPrice.toLocaleString()} 원</p>
                   </div>
-                  <ChevronRight />
+
+                  <div className={styles.container__form__content__info__btn}>
+                    <button
+                      onClick={(e) => handleDelete(product.productId, e)}
+                      disabled={isDeleting}
+                      className='cta delete'
+                      aria-label="상품 삭제"
+                      style={{ marginRight: "1rem" }}
+                    >
+                      {isDeleting ? '삭제 중...' : '삭제하기'}
+
+                    </button>
+
+                    <ChevronRight />
+                  </div>
                 </div>
               </Link>
+
             </li>
           ))
         )}
-
       </ul>
-    </div>
+    </div >
   );
 }
