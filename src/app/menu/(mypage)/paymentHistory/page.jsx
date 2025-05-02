@@ -10,24 +10,29 @@ import { API_BASE_URL } from "@/lib/api";
 
 export default function PaymentHistory() {
   const [startDate, setStartDate] = useState(() => {
-    const savedStartDate = localStorage.getItem('paymentHistoryStartDate');
-    if (savedStartDate) {
-      return new Date(savedStartDate);
-    }
     const date = new Date();
     date.setHours(0, 0, 0, 0);
     return date;
   });
 
   const [endDate, setEndDate] = useState(() => {
-    const savedEndDate = localStorage.getItem('paymentHistoryEndDate');
-    if (savedEndDate) {
-      return new Date(savedEndDate);
-    }
     const date = new Date();
     date.setHours(23, 59, 59, 999);
     return date;
   });
+
+  // Load saved dates from localStorage on component mount
+  useEffect(() => {
+    const savedStartDate = localStorage.getItem('paymentHistoryStartDate');
+    const savedEndDate = localStorage.getItem('paymentHistoryEndDate');
+
+    if (savedStartDate) {
+      setStartDate(new Date(savedStartDate));
+    }
+    if (savedEndDate) {
+      setEndDate(new Date(savedEndDate));
+    }
+  }, []);
 
   const [showDatePicker, setShowDatePicker] = useState(true);
   const [payments, setPayments] = useState([]);
@@ -115,10 +120,14 @@ export default function PaymentHistory() {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
-              localStorage.setItem('paymentHistoryStartDate', date.toISOString());
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('paymentHistoryStartDate', date.toISOString());
+              }
               if (endDate && date > endDate) {
                 setEndDate(date);
-                localStorage.setItem('paymentHistoryEndDate', date.toISOString());
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('paymentHistoryEndDate', date.toISOString());
+                }
               }
             }}
             selectsStart
@@ -135,7 +144,9 @@ export default function PaymentHistory() {
             selected={endDate}
             onChange={(date) => {
               setEndDate(date);
-              localStorage.setItem('paymentHistoryEndDate', date.toISOString());
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('paymentHistoryEndDate', date.toISOString());
+              }
             }}
             selectsEnd
             startDate={startDate}
