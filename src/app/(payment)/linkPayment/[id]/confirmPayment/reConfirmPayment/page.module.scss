@@ -1,0 +1,20 @@
+.container {
+  table {
+    width: 100%;
+    background-color: var(--white);
+    padding: var(--padding-medium);
+    border-radius: var(--radius-medium);
+
+    border-collapse: separate;
+    border-spacing: var(--padding-small);
+
+    tr th {
+      color: var(--gray3);
+      font-weight: var(--text-weight-small);
+      text-align: left;
+    }
+    tr td {
+      text-align: right;
+    }
+  }
+}

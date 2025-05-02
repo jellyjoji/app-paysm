@@ -1,178 +1,204 @@
-"use client";
+// pages/payment/index.jsx
+"use client"
 
-import { useEffect } from 'react';
-import Head from 'next/head';
+import { useEffect, useRef, useState } from 'react';
 import { API_BASE_URL } from "@/lib/api";
-import { useParams } from "next/navigation";
+import Modal from 'react-modal';
 
-export default function ReConfirmPayment() {
-  const params = useParams();
-  const productId = params?.id;
+// form	결제 요청을 위한 필수 및 선택 입력값을 포함. /payInit_hash.do로 전송됨.
+// iframe + postMessage	iframe에서 응답을 받고, 그 데이터로 실제 결제를 요청.
+// paymentRequest(receiveData)	payment.do API로 결제 요청 후, 결과를 받아 <form> 구성.
+// paymentSuccess(form, data)	결제 성공 시, 서버에 결제 정보를 저장하고 최종 결과를 전송.
+// fetch('/api/payment/successInfoAdd')	Next.js 서버 라우팅(API)으로 저장 요청 처리.
+
+export default function reConfirmPayment() {
+  const iframeRef = useRef(null);
+  const formRef = useRef(null);
+  const [encData, setEncData] = useState("5767354faf208c6fab4f6202f8babf71f1a587fe968d0ed4ca9f27cc58c78df5");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
+
   useEffect(() => {
-    console.log("경로에서 추출한 productId:", productId);
-  }, [productId]);
-
-  useEffect(() => {
-    const unitPriceInput = document.getElementById("unitPrice");
-    const goodsQty = document.getElementById("goodsQty");
-    const goodsAmt = document.getElementById("goodsAmt");
-
-    const getProductInfo = () => {
-      fetch(`${API_BASE_URL}/api/product/${productId}`)
-        .then((response) => {
-          if (!response.ok) throw new Error("api 호출 실패");
-          return response.json();
-        })
-        .then((data) => {
-          document.getElementById("merchantId").value = data.merchantId;
-          document.getElementById("mid").value = data.mid;
-          document.getElementById("goodsNm").value = data.goodsNm;
-          document.getElementById("unitPrice").value = data.unitPrice;
-          document.getElementById("goodsAmt").value = data.unitPrice;
-          document.getElementById("ordNo").value = data.ordNo;
-        })
-        .catch((error) => console.error("오류 발생:", error));
-    };
-
-    const updateAmount = () => {
-      const unitPrice = parseInt(unitPriceInput.value.trim());
-      const qty = parseInt(goodsQty.value);
-      if (isNaN(unitPrice) || isNaN(qty)) {
-        goodsAmt.value = "잘못된 값";
-        return;
-      }
-      goodsAmt.value = unitPrice * qty;
-    };
-
-    goodsQty?.addEventListener("input", updateAmount);
-    getProductInfo();
+    Modal.setAppElement('#root');
   }, []);
 
-  const getPaymentInfo = (callback) => {
-    const productId = new URLSearchParams(window.location.search).get("productId");
-    const data = {
-      productId,
-      merchantId: document.getElementById("merchantId").value,
-      mid: document.getElementById("mid").value,
-      goodsAmt: document.getElementById("goodsAmt").value,
-      goodsNm: document.getElementById("goodsNm").value,
-    };
+  useEffect(() => {
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+      const receiveData = data[1];
+      paymentRequest(receiveData);
+    });
+  }, []);
 
-    fetch(`${API_BASE_URL}/api/payment/getPaymentinfo`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+  const paymentRequest = (receiveData) => {
+    fetch("https://api.skyclassism.com/payment.do", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        tid: receiveData.tid,
+        ediDate: receiveData.ediDate,
+        mid: receiveData.mid,
+        goodsAmt: receiveData.goodsAmt,
+        charSet: receiveData.charSet,
+        encData: encData,
+        signData: receiveData.signData
+      }),
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("결제정보 요청 실패");
-        return response.json();
+      .then(res => res.text())
+      .then(response => {
+        const response_json = JSON.parse(response);
+        const form = document.createElement("form");
+        form.method = "post";
+        // 결제 성공시 리다이렉트 경로
+        form.action = `/success`;
+
+        Object.keys(response_json).forEach(key => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = response_json[key];
+          form.appendChild(input);
+        });
+
+        const customFields = {
+          payMethod: "CARD",
+          unitPrice: document.getElementById("unitPrice").value,
+          goodsQty: document.getElementById("goodsQty").value,
+          merchantId: document.getElementById("merchantId").value
+        };
+
+        Object.keys(customFields).forEach(key => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = customFields[key];
+          form.appendChild(input);
+        });
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+
+        paymentSuccess(form, data);
       })
-      .then((result) => {
-        document.getElementById("payMethod").value = result.payMethod;
-        document.getElementById("mid").value = result.mid;
-        document.getElementById("goodsNm").value = result.goodsNm;
-        document.getElementById("unitPrice").value = result.goodsAmt;
-        document.getElementById("goodsAmt").value = result.goodsAmt;
-        document.getElementById("ediDate").value = result.ediDate;
-        document.getElementById("encData").value = result.encData;
-        if (callback) callback();
-      })
-      .catch((error) => console.error("오류 발생:", error));
+      .catch(error => console.error("Error occurred:", error));
   };
 
-  const sendToInit = () => {
-    getPaymentInfo(() => {
-      const form = document.getElementById("postForm");
-      const formData = new FormData(form);
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-      form.submit();
-    });
+  const paymentSuccess = (form, data) => {
+    fetch(`${API_BASE_URL}/api/payment/successInfoAdd`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("등록 실패");
+        return res.json();
+      })
+      .then(() => {
+        alert("결제 성공");
+        document.body.appendChild(form);
+        form.submit();
+      })
+      .catch(error => {
+        console.error("오류 발생:", error);
+        alert("결제 등록 중 오류 발생");
+      });
   };
 
   return (
-    <>
-      <Head>
-        <title>Home</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
-          crossOrigin="anonymous"
-        />
-      </Head>
-      <div className="container text-center mt-5">
-        <div className="row">
-          <div className="col-4"></div>
-          <div className="col-4">
-            <form method="post" action="/payment/paymentInit" target="_blank" id="postForm">
-              <div className="mb-5 h3">필수</div>
-              <div className="form-group">
-                <label htmlFor="payMethod">결제수단</label>
-                <input type="text" className="form-control" id="payMethod" name="payMethod" defaultValue="card" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="merchantId">merchantId</label>
-                <input type="text" className="form-control" id="merchantId" name="merchantId" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="mid">MID</label>
-                <input type="text" className="form-control" id="mid" name="mid" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="goodsNm">상품명</label>
-                <input type="text" className="form-control" id="goodsNm" name="goodsNm" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="ordNo">주문번호</label>
-                <input type="text" className="form-control" id="ordNo" name="ordNo" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="unitPrice">상품 금액</label>
-                <input type="text" className="form-control" id="unitPrice" name="unitPrice" />
-              </div>
-              <div className="form-group">
-                <label>수량:</label>
-                <input type="number" id="goodsQty" name="goodsQty" min="1" defaultValue="1" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="goodsAmt">결제금액</label>
-                <input type="text" className="form-control" id="goodsAmt" name="goodsAmt" />
-              </div>
-              <input type="hidden" id="ediDate" name="ediDate" />
-              <input type="hidden" id="encData" name="encData" />
-              <div className="mt-5 h3">선택사항</div>
-              <div className="form-group">
-                <label htmlFor="ordTel">구매자연락처</label>
-                <input type="text" className="form-control" id="ordTel" name="ordTel" defaultValue="01000000000" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="returnUrl">returnUrl</label>
-                <input type="text" className="form-control" id="returnUrl" name="returnUrl" defaultValue="/payment/result" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="trxCd">trxCd</label>
-                <input type="text" className="form-control" id="trxCd" name="trxCd" defaultValue="0" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="mbsUsrId">mbsUsrId</label>
-                <input type="text" className="form-control" id="mbsUsrId" name="mbsUsrId" defaultValue="고객명" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="charSet">charSet</label>
-                <input type="text" className="form-control" id="charSet" name="charSet" defaultValue="UTF-8" />
-              </div>
-              <div id="payInfoDiv"></div>
-            </form>
-            <button onClick={sendToInit} className="btn btn-secondary mt-3">
-              최종확인 페이지로 전달
-            </button>
-          </div>
-          <div className="col-4"></div>
-        </div>
-      </div>
-    </>
+    <div>
+      <form
+        method="post"
+        action="https://api.skyclassism.com/payInit_hash.do"
+        target="responseIframe"
+        id="postForm"
+        ref={formRef}
+      >
+        <table>
+          <tbody>
+            <tr><td colSpan="2"><h3>필수</h3></td></tr>
+            <tr>
+              <td><label>결제수단</label></td>
+              <td><input name="payMethod" defaultValue="CARD" /></td>
+            </tr>
+            <tr>
+              <td><label>MID</label></td>
+              <td><input name="mid" defaultValue="paysmtestm" /></td>
+            </tr>
+            <tr>
+              <td><label>merchantId</label></td>
+              <td><input id="merchantId" name="merchantId" defaultValue="MID-d493c260-2c80-4f46-a6e8-fdbcc66d6130" /></td>
+            </tr>
+            <tr>
+              <td><label>상품명</label></td>
+              <td><input name="goodsNm" defaultValue="111" /></td>
+            </tr>
+            <tr>
+              <td><label>주문번호</label></td>
+              <td><input name="ordNo" defaultValue="20250430161341-0206" /></td>
+            </tr>
+            <tr>
+              <td><label>상품 금액</label></td>
+              <td><input id="unitPrice" name="unitPrice" defaultValue="1000" /></td>
+            </tr>
+            <tr>
+              <td><label>수량</label></td>
+              <td><input id="goodsQty" name="goodsQty" defaultValue="1" /></td>
+            </tr>
+            <tr>
+              <td><label>결제금액</label></td>
+              <td><input name="goodsAmt" defaultValue="1000" /></td>
+            </tr>
+            <tr>
+              <td><label>ediDate</label></td>
+              <td><input name="ediDate" defaultValue="20250430163502" /></td>
+            </tr>
+            <tr>
+              <td><label>encData</label></td>
+              <td><input name="encData" defaultValue={encData} /></td>
+            </tr>
+
+            <tr><td colSpan="2"><h3>선택사항</h3></td></tr>
+            <tr>
+              <td><label>구매자연락처</label></td>
+              <td><input name="ordTel" defaultValue="01000000000" /></td>
+            </tr>
+            <tr>
+              <td><label>returnUrl</label></td>
+              <td><input name="returnUrl" defaultValue="http://api.hitguys.net:80/payment/paymentAppRes" /></td>
+            </tr>
+            <tr>
+              <td><label>trxCd</label></td>
+              <td><input name="trxCd" defaultValue="0" /></td>
+            </tr>
+            <tr>
+              <td><label>mbsUsrId</label></td>
+              <td><input name="mbsUsrId" defaultValue="고객명" /></td>
+            </tr>
+            <tr>
+              <td><label>mbsReserved</label></td>
+              <td><input name="mbsReserved" defaultValue="reservedField" /></td>
+            </tr>
+            <tr>
+              <td><label>charSet</label></td>
+              <td><input name="charSet" defaultValue="UTF-8" /></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button className='cta' type="submit" onClick={openModal}>
+          결제 요청 제출
+        </button>
+      </form>
+
+      <Modal isOpen={isOpen} onRequestClose={closeModal} contentLabel="결제 프레임 모달">
+        <button onClick={closeModal}>모달 닫기</button>
+        <iframe ref={iframeRef} name="responseIframe" style={{ width: "100%", height: "100vh", position: 'relative' }} />
+      </Modal>
+    </div>
   );
 }
