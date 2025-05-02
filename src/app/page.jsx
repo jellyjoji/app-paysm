@@ -55,7 +55,7 @@ export default function Home() {
           </div>
         </Link>
 
-        <Link href="https://www.paysm.net" passHref>
+        <Link href="https://www.paysm.net" target="_blank" rel="noopener noreferrer">
           <div className={styles.container__content__item}>
             <Image src="/paysm.png" alt="페이즘 바로가기"
               width={100}
