@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./page.module.scss";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
@@ -9,19 +10,17 @@ export default function PaymentPage() {
   const params = useParams();
   const productId = params?.id;
 
-  useEffect(() => {
-    console.log("경로에서 추출한 productId:", productId);
-  }, [productId]);
-
   const [formValues, setFormValues] = useState({
+    // 시스템 필드 - 숨김
     payMethod: "card",
     merchantId: "",
     mid: "",
+    // 표시 필드
     goodsNm: "",
-    ordNo: "",
     unitPrice: "",
     goodsQty: 1,
     goodsAmt: "",
+    // 시스템 필드 - 숨김
     ediDate: "",
     encData: "",
     ordTel: "01000000000",
@@ -29,7 +28,12 @@ export default function PaymentPage() {
     trxCd: "0",
     mbsUsrId: "고객명",
     charSet: "UTF-8",
+    ordNo: "",
   });
+
+  useEffect(() => {
+    console.log("경로에서 추출한 productId:", productId);
+  }, [productId]);
 
   useEffect(() => {
     if (productId) {
@@ -110,35 +114,36 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="container text-center mt-5">
+    <div className={styles.container}>
       <form onSubmit={handleSubmit}>
-        <h3 className="mb-5">필수</h3>
-        {[
-          { label: "결제수단", name: "payMethod" },
-          { label: "merchantId", name: "merchantId" },
-          { label: "MID", name: "mid" },
-          { label: "상품명", name: "goodsNm" },
-          { label: "주문번호", name: "ordNo" },
-          { label: "상품 금액", name: "unitPrice" },
-          { label: "결제금액", name: "goodsAmt" },
-        ].map((field) => (
-          <div className="form-group" key={field.name}>
-            <label>{field.label}</label>
-            <input
-              type="text"
-              className="form-control"
-              name={field.name}
-              value={formValues[field.name]}
-              onChange={handleChange}
-            />
-          </div>
-        ))}
+        <h3>결제 정보</h3>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
+          <label>상품명</label>
+          <input
+            type="text"
+            name="goodsNm"
+            value={formValues.goodsNm}
+            onChange={handleChange}
+            readOnly
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>상품 금액</label>
+          <input
+            type="text"
+            name="unitPrice"
+            value={Number(formValues.unitPrice).toLocaleString()}
+            onChange={handleChange}
+            readOnly
+          />
+        </div>
+
+        <div className={styles.formGroup}>
           <label>수량</label>
           <input
             type="number"
-            className="form-control"
             name="goodsQty"
             min="1"
             value={formValues.goodsQty}
@@ -146,22 +151,19 @@ export default function PaymentPage() {
           />
         </div>
 
-        <h3 className="mt-5">선택사항</h3>
-        {["ordTel", "returnUrl", "trxCd", "mbsUsrId", "charSet"].map((name) => (
-          <div className="form-group" key={name}>
-            <label>{name}</label>
-            <input
-              type="text"
-              className="form-control"
-              name={name}
-              value={formValues[name]}
-              onChange={handleChange}
-            />
-          </div>
-        ))}
+        <div className={styles.formGroup}>
+          <label>결제금액</label>
+          <input
+            type="text"
+            name="goodsAmt"
+            value={Number(formValues.goodsAmt).toLocaleString()}
+            onChange={handleChange}
+            readOnly
+          />
+        </div>
 
-        <button type="submit" className="btn btn-secondary mt-3">
-          최종확인 페이지로 전달
+        <button type="submit" className="cta">
+          결제하기
         </button>
       </form>
     </div>

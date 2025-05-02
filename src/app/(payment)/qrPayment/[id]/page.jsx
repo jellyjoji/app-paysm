@@ -108,33 +108,38 @@ export default function QrPaymentDetail() {
       <div className={styles.container__form}>
         <div className={styles.container__form__content}>
           <label htmlFor="goodsNm">상품명</label>
-          <input type="text" id="goodsNm" value={product.goodsNm} readOnly />
+          <input type="text" id="goodsNm" value={product?.goodsNm} readOnly />
         </div>
 
         <div className={styles.container__form__content}>
-          <label htmlFor="unitPrice">상품 가격</label>
+          <label htmlFor="unitPrice">상품 금액</label>
           <input
             type="text"
             id="unitPrice"
-            value={Number(product.unitPrice).toLocaleString()}
+            value={product?.unitPrice ? Number(product.unitPrice).toLocaleString() : ''}
             readOnly
           />
         </div>
 
         <div className={styles.container__form__content}>
-          <label htmlFor="payType">결제 방식</label>
-          <input type="text" id="payType" value={product.payType} readOnly />
+          <label htmlFor="goodsQty">수량</label>
+          <input
+            type="number"
+            id="goodsQty"
+            defaultValue="1"
+            min="1"
+          />
         </div>
 
         <div className={styles.container__form__content}>
-          <label htmlFor="mid">가맹점 ID</label>
-          <input type="text" id="mid" value={product.mid} readOnly />
+          <label htmlFor="goodsAmt">결제금액</label>
+          <input
+            type="text"
+            id="goodsAmt"
+            value={product?.unitPrice ? Number(product.unitPrice).toLocaleString() : ''}
+            readOnly
+          />
         </div>
-
-        {/* <div className={styles.container__form__content}>
-          <label htmlFor="payLink">결제 링크</label>
-          <textarea type="text" id="payLink" value={payLink} readOnly />
-        </div> */}
 
         <div className={styles.container__form__content}>
           <label htmlFor="qrcode">QR 코드</label>
