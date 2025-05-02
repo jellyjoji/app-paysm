@@ -189,6 +189,11 @@ textarea {
 select {
   padding: 0.8rem;
   border-radius: var(--radius-small);
+  background-color: var(--white);
+
+  appearance: none; /* 기본 UI 제거 */
+  -webkit-appearance: none; /* Safari/Chrome */
+  -moz-appearance: none; /* Firefox */
 }
 .cta {
   color: var(--white);
