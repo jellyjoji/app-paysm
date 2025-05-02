@@ -49,6 +49,10 @@ export default function Header() {
     }
 
     // QR 결제 관련 경로
+    if (path.startsWith('/qrpayment/') && path.endsWith('/confirmpayment')) {
+      setTitle('결제 요청하기');
+      return;
+    }
     if (path.startsWith('/qrpayment/') && path.endsWith('/addqrpayment')) {
       setTitle('QR 결제 추가하기');
       return;

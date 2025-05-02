@@ -89,6 +89,8 @@ export default function reConfirmPayment() {
   };
 
   const paymentSuccess = (form, data) => {
+    console.log('Payment Success Data:', data); // Add payment data logging
+
     fetch(`${API_BASE_URL}/api/payment/successInfoAdd`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -98,7 +100,8 @@ export default function reConfirmPayment() {
         if (!res.ok) throw new Error("등록 실패");
         return res.json();
       })
-      .then(() => {
+      .then((response) => {
+        console.log('Payment API Response:', response); // Add API response logging
         alert("결제 성공");
         document.body.appendChild(form);
         form.submit();

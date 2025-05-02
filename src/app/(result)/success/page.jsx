@@ -1,38 +1,34 @@
 "use client"
 import Image from 'next/image';
 import styles from "./page.module.scss";
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function Success() {
+  const searchParams = useSearchParams();
+  const [paymentData, setPaymentData] = useState(null);
 
+  useEffect(() => {
+    // Convert URL search params to object
+    const data = {};
+    searchParams.forEach((value, key) => {
+      data[key] = value;
+    });
+    setPaymentData(data);
+  }, [searchParams]);
 
-  // const data = [
-  //   ['charSet', 'UTF-8'],
-  //   ['resultCd', '0000'],
-  //   ['acqCardCd', '06'],
-  //   ['cancelYN', 'N'],
-  //   ['cardType', '0'],
-  //   ['mid', 'paysmtestm'],
-  //   ['appNo', '32583497'],
-  //   ['amt', '1000'],
-  //   ['cardNo', '624331001114'],
-  //   ['tid', 'paysmtestm01012504301227050282'],
-  //   ['resultMsg', '정상처리'],
-  //   ['ordNm', ''],
-  //   ['ordNo', '20250430122701-0087'],
-  //   ['mbsReserved', 'reservedField'],
-  //   ['payMethod', 'CARD'],
-  //   ['fnNm', '신한'],
-  //   ['quota', '00'],
-  //   ['appDtm', '20250430122729'],
-  //   ['ediDate', '20250430122729'],
-  //   ['usePointAmt', ''],
-  //   ['authType', '03'],
-  //   ['goodsName', '111'],
-  //   ['appCardCd', '06'],
-  //   ['unitPrice', '1000'],
-  //   ['goodsQty', '1'],
-  //   ['merchantId', 'MID-d493c260-2c80-4f46-a6e8-fdbcc66d6130'],
-  // ];
+  // Payment data fields to display
+  const displayFields = [
+    { key: 'goodsName', label: '상품명' },
+    { key: 'amt', label: '결제금액' },
+    { key: 'payMethod', label: '결제수단' },
+    { key: 'fnNm', label: '카드사' },
+    { key: 'cardNo', label: '카드번호' },
+    { key: 'quota', label: '할부' },
+    { key: 'appNo', label: '승인번호' },
+    { key: 'appDtm', label: '승인일시' },
+    { key: 'resultMsg', label: '결제결과' }
+  ];
 
   return (
     <div className={styles.container}>
@@ -40,22 +36,34 @@ export default function Success() {
         width={130}
         height={130} />
       <h2>결제에 성공하였습니다.</h2>
-      {/* <table>
-        <thead>
-          <tr>
-            <th>항목</th>
-            <th>내용</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map(([label, value], index) => (
-            <tr key={index}>
-              <td><strong>{label}</strong></td>
-              <td>{value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table> */}
+
+      {paymentData && (
+        <div className={styles.paymentDetails}>
+          <table>
+            <tbody>
+              {displayFields.map(({ key, label }) => (
+                paymentData[key] && (
+                  <tr key={key}>
+                    <th>{label}</th>
+                    <td>
+                      {key === 'amt'
+                        ? `${Number(paymentData[key]).toLocaleString()}원`
+                        : key === 'quota'
+                          ? paymentData[key] === '00'
+                            ? '일시불'
+                            : `${paymentData[key]}개월`
+                          : key === 'cardNo'
+                            ? `${paymentData[key].slice(-4).padStart(paymentData[key].length, '*')}`
+                            : paymentData[key]
+                      }
+                    </td>
+                  </tr>
+                )
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
