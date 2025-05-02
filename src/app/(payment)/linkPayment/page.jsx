@@ -24,7 +24,7 @@ export default function LinkPayment() {
         .then((response) => {
           if (!response.ok) {
             if (response.status === 403) {
-              throw new Error("접근 권한이 없습니다. 결제 필수 정보 상태를 확인해주세요. Merchant ID 와 상점 Key 를 발급받아주세요.");
+              throw new Error("접근 권한이 없습니다. 결제 필수 정보 상태를 확인해주세요. MID 와 상점 Key 를 발급받아주세요.");
             }
             throw new Error("상품 목록을 불러오는 데 실패했습니다.");
           }
