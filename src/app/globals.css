@@ -108,6 +108,7 @@
 } */
 
 html {
+  font-size: 16px;
   max-width: var(--max-width);
   margin-left: auto;
   margin-right: auto;
