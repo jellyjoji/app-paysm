@@ -107,7 +107,7 @@ export default function Signup() {
           <label htmlFor="userName">이름</label>
           <input type="text" name="userName" id="userName" value={form.userName} onChange={handleChange} placeholder="홍길동" />
         </div>
-        <div className={styles.container__form__content}>
+        {/* <div className={styles.container__form__content}>
           <label htmlFor="email">이메일</label>
           <input
             type="email"
@@ -117,7 +117,7 @@ export default function Signup() {
             onChange={handleChange}
             placeholder="example@email.com"
           />
-        </div>
+        </div> */}
         <div className={styles.container__form__content}>
           <label htmlFor="userPhone">전화번호</label>
           <input type="tel" name="userPhone" id="userPhone" value={form.userPhone} onChange={handleChange} placeholder="010-1234-5678"

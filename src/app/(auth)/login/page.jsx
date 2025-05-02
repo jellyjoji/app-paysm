@@ -98,11 +98,19 @@ export default function Login() {
         <p >{msg}</p>
       </form>
 
-      <Link href="/signup">
-        <div>
-          계정이 없으신가요? <strong>회원가입</strong>
-        </div>
-      </Link>
+      <div className={styles.container__links}>
+        <Link href="/signup">
+          <div>
+            계정이 없으신가요? <strong>회원가입</strong>
+          </div>
+        </Link>
+
+        <Link href="https://www.paysm.net" target="_blank" rel="noopener noreferrer">
+          <div>
+            전자결제가 필요하신가요? <strong>PAYsm 바로가기</strong>
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
