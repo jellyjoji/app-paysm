@@ -69,34 +69,70 @@ export default function ManualPayment() {
     const expiryInput = inputRef.current;
 
     const handleInput = (e) => {
-      let value = e.target.value.replace(/\D/g, '').slice(0, 4);
-      if (value.length >= 3) {
-        value = value.slice(0, 2) + '/' + value.slice(2);
+      let value = e.target.value;
+
+      // 숫자만 추출
+      value = value.replace(/\D/g, '');
+
+      // 4자리로 제한 (MM/YY)
+      value = value.slice(0, 4);
+
+      // MM/YY 형식으로 포맷팅
+      if (value.length >= 2) {
+        // 월이 12를 넘지 않도록
+        let month = parseInt(value.slice(0, 2));
+        if (month > 12) month = 12;
+        if (month < 1) month = 1;
+        month = month.toString().padStart(2, '0');
+
+        value = month + (value.length > 2 ? '/' + value.slice(2) : '');
       }
+
       e.target.value = value;
-      handleChange(e);
+
+      // formData 업데이트
+      setFormData(prev => ({
+        ...prev,
+        expireYymm: value.replace('/', '') // 저장할 때는 구분자 제거
+      }));
     };
 
-    expiryInput.addEventListener('input', handleInput);
-    return () => expiryInput.removeEventListener('input', handleInput);
+    if (expiryInput) {
+      expiryInput.addEventListener('input', handleInput);
+      return () => expiryInput.removeEventListener('input', handleInput);
+    }
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === 'goodsAmt') {
-      // Remove all non-numeric characters
+    if (name === 'cardNo') {
+      // 숫자만 추출
       const numericValue = value.replace(/[^\d]/g, '');
 
-      // Format with thousand separators
-      const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      // 16자리로 제한
+      const truncatedValue = numericValue.slice(0, 16);
+
+      // 4자리마다 하이픈 추가
+      const formattedValue = truncatedValue.replace(/(\d{4})(?=\d)/g, '$1-');
 
       setFormData(prev => ({
         ...prev,
-        [name]: numericValue // Store the numeric value without commas
+        [name]: numericValue // 저장은 숫자만
       }));
 
-      // Set the formatted value back to the input
+      // 화면에는 하이픈이 포함된 형식으로 표시
+      e.target.value = formattedValue;
+      return;
+    }
+
+    if (name === 'goodsAmt') {
+      const numericValue = value.replace(/[^\d]/g, '');
+      const formattedValue = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
       e.target.value = formattedValue;
       return;
     }
@@ -198,11 +234,11 @@ export default function ManualPayment() {
             type="text"
             name="cardNo"
             id="cardNo"
-            value={formData.cardNo}
+            value={formData.cardNo.replace(/(\d{4})(?=\d)/g, '$1-')}
             onChange={handleChange}
-            placeholder="1234 5678 9012 3456"
+            placeholder="1234-5678-9012-3456"
             inputMode="numeric"
-            maxLength="16"
+            maxLength="19"
           />
         </div>
 
@@ -214,8 +250,8 @@ export default function ManualPayment() {
             id="ordAuthNo"
             value={formData.ordAuthNo}
             onChange={handleChange}
-            placeholder="생년월일 6자리"
-            maxLength="6"
+            placeholder="생년월일 6자리 혹은 사업자등록번호 10자리"
+            maxLength="10"
           />
         </div>
 
@@ -225,7 +261,7 @@ export default function ManualPayment() {
             type="text"
             name="expireYymm"
             id="expireYymm"
-            value={formData.expireYymm}
+            value={formData.expireYymm.replace(/(\d{2})(?=\d)/, '$1/')}
             onChange={handleChange}
             placeholder="MM/YY"
             maxLength="5"
